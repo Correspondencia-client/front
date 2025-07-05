@@ -3,8 +3,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type RegisterFormData, registerFormSchema } from "@/schemas/auth";
+import { toast } from "sonner";
+import api from "@/lib/axios";
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 export function useSignupForm() {
+  const router = useRouter();
+
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
@@ -26,16 +32,42 @@ export function useSignupForm() {
   const { isValid, isSubmitting } = form.formState;
 
   const onSubmit = async (data: RegisterFormData) => {
-    console.log("Datos del formulario:", data);
+    const payload = {
+      email: data.email,
+      password: data.password,
+      fullName: data.fullName,
+      typePerson: data.typePerson,
+      typeIdentification: data.typeIdentification,
+      numberIdentification: data.numberIdentification,
+      phone: data.phone,
+      gender: data.gender,
+      country: data.country,
+      birthDate: new Date(data.birthDate).toISOString(),
+      address: data.address,
+      city: data.city,
+    };
 
     try {
-      // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await api.post("/auth/register-citizen", payload);
 
-      // Aquí iría la lógica para enviar los datos al servidor
-      console.log("Usuario registrado exitosamente");
+      toast.success("Registro exitoso", {
+        description:
+          "Hemos enviado un correo de verificación. Por favor, revisa tu bandeja de entrada.",
+      });
+
+      router.push("/iniciar-sesion");
+      form.reset();
     } catch (error) {
-      console.error("Error al registrar usuario:", error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      toast.error("Error al registrarse", {
+        description:
+          axiosError.response?.data?.message ??
+          axiosError.message ??
+          "Ocurrió un error inesperado.",
+      });
+
+      console.error("Axios error:", axiosError);
     }
   };
 

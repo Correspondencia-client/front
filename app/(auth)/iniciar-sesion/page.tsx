@@ -88,7 +88,7 @@ export default function LoginPage() {
             {/* Forgot Password Link */}
             <div className="text-right">
               <Link
-                href="/forgot-password"
+                href="/recuperar-clave"
                 className="text-sm text-gray-400 hover:text-blue-500 transition-colors"
               >
                 ¿Olvidaste tu contraseña?
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   Iniciando sesión...
                 </div>
               ) : (
-                "Iniciar Sesión"
+                "Iniciar sesión"
               )}
             </Button>
           </form>

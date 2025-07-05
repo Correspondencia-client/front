@@ -6,6 +6,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +19,8 @@ import {
 import { User } from "lucide-react";
 import type { Control } from "react-hook-form";
 import type { RegisterFormData } from "@/schemas/auth";
+import { gender, identificationType, typeOfPerson } from "@/constants/auth";
+import { RequiredDot } from "@/components/common/required-dot";
 
 interface PersonalDataSectionProps {
   control: Control<RegisterFormData>;
@@ -44,7 +47,7 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="fullName"
           render={({ field }) => (
             <FormItem className="md:col-span-2">
-              <FormLabel>Nombre Completo</FormLabel>
+              <FormLabel>Nombre Completo <RequiredDot /></FormLabel>
               <FormControl>
                 <Input placeholder="Ingresa tu nombre completo" {...field} />
               </FormControl>
@@ -58,7 +61,7 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="typePerson"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Persona</FormLabel>
+              <FormLabel>Tipo de Persona <RequiredDot /></FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -66,8 +69,11 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="natural">Persona Natural</SelectItem>
-                  <SelectItem value="juridica">Persona Jurídica</SelectItem>
+                  {typeOfPerson.map(({ value, label }, i) => (
+                    <SelectItem key={i} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -80,7 +86,7 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="typeIdentification"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Identificación</FormLabel>
+              <FormLabel>Tipo de Identificación <RequiredDot /></FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -88,10 +94,11 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="cedula">Cédula</SelectItem>
-                  <SelectItem value="pasaporte">Pasaporte</SelectItem>
-                  <SelectItem value="nit">NIT</SelectItem>
-                  <SelectItem value="rut">RUT</SelectItem>
+                  {identificationType.map(({ value, label }, i) => (
+                    <SelectItem key={i} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -104,13 +111,14 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="numberIdentification"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Número de Identificación</FormLabel>
+              <FormLabel>Número de Identificación <RequiredDot /></FormLabel>
               <FormControl>
                 <Input
                   placeholder="Ingresa tu número de identificación"
                   {...field}
                 />
               </FormControl>
+              <FormDescription>Solo debe contener números</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -121,10 +129,11 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Teléfono</FormLabel>
+              <FormLabel>Teléfono <RequiredDot /></FormLabel>
               <FormControl>
-                <Input placeholder="+57 300 123 4567" {...field} />
+                <Input placeholder="300 123 4567" {...field} />
               </FormControl>
+              <FormDescription>Solo debe contener números</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -135,7 +144,7 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
           name="gender"
           render={({ field }) => (
             <FormItem className="md:col-span-2">
-              <FormLabel>Género</FormLabel>
+              <FormLabel>Género <RequiredDot /></FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -143,12 +152,11 @@ export function PersonalDataSection({ control }: PersonalDataSectionProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="masculino">Masculino</SelectItem>
-                  <SelectItem value="femenino">Femenino</SelectItem>
-                  <SelectItem value="otro">Otro</SelectItem>
-                  <SelectItem value="prefiero_no_decir">
-                    Prefiero no decir
-                  </SelectItem>
+                  {gender.map(({ value, label }, i) => (
+                    <SelectItem key={i} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />

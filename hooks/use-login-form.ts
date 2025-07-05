@@ -3,29 +3,44 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type LoginData, loginSchema } from "@/schemas/auth";
+import api from "@/lib/axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 export function useLoginForm() {
+  const router = useRouter();
+
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email:"",
-      password: ""
+      email: "",
+      password: "",
     },
   });
 
   const { isValid, isSubmitting } = form.formState;
 
   const onSubmit = async (data: LoginData) => {
-    console.log("Datos del formulario:", data);
-
     try {
-      // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
 
-      // Aquí iría la lógica para enviar los datos al servidor
-      console.log("Usuario logueado exitosamente");
+      router.push("/panel");
+      form.reset();
     } catch (error) {
-      console.error("Error al loguear usuario:", error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      toast.error("Error al iniciar sesión", {
+        description:
+          axiosError.response?.data?.message ??
+          axiosError.message ??
+          "Ocurrió un error inesperado.",
+      });
+
+      console.error("Error al loguear usuario:", axiosError);
     }
   };
 

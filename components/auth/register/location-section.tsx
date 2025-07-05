@@ -18,6 +18,8 @@ import {
 import { MapPin } from "lucide-react";
 import type { Control } from "react-hook-form";
 import type { RegisterFormData } from "@/schemas/auth";
+import { countries } from "@/constants/auth";
+import { RequiredDot } from "@/components/common/required-dot";
 
 interface LocationSectionProps {
   control: Control<RegisterFormData>;
@@ -44,7 +46,7 @@ export function LocationSection({ control }: LocationSectionProps) {
           name="country"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>País</FormLabel>
+              <FormLabel>País <RequiredDot /></FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -52,19 +54,11 @@ export function LocationSection({ control }: LocationSectionProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="colombia">Colombia</SelectItem>
-                  <SelectItem value="mexico">México</SelectItem>
-                  <SelectItem value="argentina">Argentina</SelectItem>
-                  <SelectItem value="chile">Chile</SelectItem>
-                  <SelectItem value="peru">Perú</SelectItem>
-                  <SelectItem value="venezuela">Venezuela</SelectItem>
-                  <SelectItem value="ecuador">Ecuador</SelectItem>
-                  <SelectItem value="bolivia">Bolivia</SelectItem>
-                  <SelectItem value="uruguay">Uruguay</SelectItem>
-                  <SelectItem value="paraguay">Paraguay</SelectItem>
-                  <SelectItem value="espana">España</SelectItem>
-                  <SelectItem value="estados_unidos">Estados Unidos</SelectItem>
-                  <SelectItem value="otro">Otro</SelectItem>
+                  {countries.map(({ value, label }, i) => (
+                    <SelectItem key={i} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -77,7 +71,7 @@ export function LocationSection({ control }: LocationSectionProps) {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ciudad</FormLabel>
+              <FormLabel>Ciudad <RequiredDot /></FormLabel>
               <FormControl>
                 <Input placeholder="Ingresa tu ciudad" {...field} />
               </FormControl>
@@ -91,7 +85,7 @@ export function LocationSection({ control }: LocationSectionProps) {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Dirección</FormLabel>
+              <FormLabel>Dirección <RequiredDot /></FormLabel>
               <FormControl>
                 <Input placeholder="Ingresa tu dirección completa" {...field} />
               </FormControl>
@@ -105,7 +99,7 @@ export function LocationSection({ control }: LocationSectionProps) {
           name="birthDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Fecha de Nacimiento</FormLabel>
+              <FormLabel>Fecha de Nacimiento <RequiredDot /></FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>

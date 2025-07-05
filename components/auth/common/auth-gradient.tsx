@@ -19,11 +19,6 @@ export function AuthGradient() {
       </div>
 
       <div className="relative z-10 flex flex-col justify-center items-start h-full px-12 py-16 text-white">
-        {/* Logo Section */}
-        <div className="absolute left-12 top-8 space-y-3">
-          <Logo showName logoClassname="size-8" />
-        </div>
-
         {/* Main Content */}
         <div className="max-w-lg space-y-8">
           {/* Hero Title */}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Eye, EyeOff, Shield } from "lucide-react"
 import type { Control, UseFormWatch } from "react-hook-form"
 import type { RegisterFormData } from "@/schemas/auth"
+import { RequiredDot } from "@/components/common/required-dot"
 
 interface CredentialsSectionProps {
   control: Control<RegisterFormData>
@@ -51,7 +52,7 @@ export function CredentialsSection({ control, watch }: CredentialsSectionProps) 
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Correo Electrónico</FormLabel>
+              <FormLabel>Correo Electrónico <RequiredDot /></FormLabel>
               <FormControl>
                 <Input
                   type="email"
@@ -69,7 +70,7 @@ export function CredentialsSection({ control, watch }: CredentialsSectionProps) 
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contraseña</FormLabel>
+              <FormLabel>Contraseña <RequiredDot /></FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
@@ -81,7 +82,7 @@ export function CredentialsSection({ control, watch }: CredentialsSectionProps) 
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
