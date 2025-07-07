@@ -1,43 +1,20 @@
-"use client"
-
-import { Button } from '@/components/ui/button'
-import api from '@/lib/axios';
-import { useRouter } from 'next/navigation';
-import React from 'react'
-import { toast } from 'sonner';
+import { SiteHeader } from "@/components/navigation/site-header";
+import React from "react";
 
 export default function DashboardPage() {
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    try {
-      await api.get("/auth/logout");
-
-      // Reset store statuses
-      // useAuthStore.getState().clearUser();
-      // useSchoolStore.getState().reset();
-
-      // Delete persistent storage
-      // localStorage.removeItem("auth-storage");
-      // localStorage.removeItem("school-store");
-
-      // Clear all cookies
-      document.cookie.split(";").forEach((cookie) => {
-        const [name] = cookie.split("=");
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-      });
-
-      router.replace("/iniciar-sesion");
-    } catch (error) {
-      toast.error(
-        "Error al cerrar sesión. Por favor, inténtalo de nuevo más tarde."
-      );
-    }
-  };
-
   return (
-    <div>
-      <Button onClick={handleLogout}>Cerrar sesión</Button>
+    <div className="relative h-dvh overflow-y-auto">
+      <SiteHeader title="Panel" />
+      <div className="flex flex-col gap-6">
+        <h2>Panel</h2>
+        <div className="h-[300px] bg-red-50"></div>
+        <div className="h-[300px] bg-red-50"></div>
+        <div className="h-[300px] bg-red-50"></div>
+        <div className="h-[300px] bg-red-50"></div>
+        <div className="h-[300px] bg-red-50"></div>
+        <div className="h-[300px] bg-red-50"></div>
+      </div>
+      <h3>No se corta el contenido</h3>
     </div>
-  )
+  );
 }

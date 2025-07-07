@@ -7,9 +7,11 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function useLoginForm() {
   const router = useRouter();
+  const { setUser } = useAuthStore();
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -23,11 +25,19 @@ export function useLoginForm() {
 
   const onSubmit = async (data: LoginData) => {
     try {
-      await api.post("/auth/login", {
+      const response = await api.post("/auth/login", {
         email: data.email,
         password: data.password,
       });
 
+      console.log(response);
+
+      setUser({
+        email: response.data.email,
+        fullName: response.data.fullName,
+        id: response.data.id,
+        role: response.data.role,
+      });
       router.push("/panel");
       form.reset();
     } catch (error) {

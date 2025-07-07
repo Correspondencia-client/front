@@ -8,11 +8,11 @@ const publicRoutes = [
   "/reestablecer-clave",
   "/recuperar-clave",
 ];
-// const rolePermissions: Record<string, string[]> = {
-//   DOCENTE: ["/dashboard", "/config"],
-//   ADMIN: ["/dashboard", "/config", "/users"],
-//   SUPER: ["/dashboard", "/config", "/users", "/institutions", "/admin"],
-// };
+const rolePermissions: Record<string, string[]> = {
+  CITIZEN: ["/panel",],
+  ADMIN: ["/panel", "/gestion-usuarios/admin"],
+  SUPER: ["/panel", "/gestion-usuarios/superadmin"],
+};
 
 // No manipula headers ni cookies si no es necesario.
 // async function verifyAccessToken(token: string) {
