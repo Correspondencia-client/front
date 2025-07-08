@@ -14,6 +14,10 @@ import { AnimatedPaginator } from "@/components/common/animated-paginator";
 import { EntityItem } from "@/components/users/super-admin/sidebar/entity-item";
 import { EntityTypeSelect } from "@/components/users/super-admin/sidebar/entity-type-select";
 import { SkeletonEntityList } from "@/components/users/super-admin/skeletons/skeleton-entity-list";
+import { Inbox, Search } from "lucide-react";
+import { EmptySidebarEntities } from "../states/empty-sidebar-entities";
+import { EntityList } from "./entity-list";
+import { cn } from "@/lib/utils";
 
 export function EntitySidebar() {
   const limit = 10;
@@ -39,7 +43,7 @@ export function EntitySidebar() {
   const entities = entitiesData?.entities ?? [];
 
   return (
-    <Card className="w-80 h-full shrink-0 rounded-none shadow-none border-r">
+    <Card className="hidden md:flex w-80 h-full shrink-0 rounded-none border-r">
       <CardHeader className="gap-3">
         <EntityTypeSelect entityTypes={entityTypes.types} />
         <SearchInput
@@ -48,28 +52,17 @@ export function EntitySidebar() {
           onSearch={setSearchTerm}
         />
       </CardHeader>
-      <CardContent className="flex-1 space-y-2">
-        {isLoadingTypes ? (
-          <SkeletonEntityList count={skeletonCount} />
-        ) : typesError ? (
-          <div className="text-center py-4 text-red-600">
-            Error al cargar tipos de entidades
-          </div>
-        ) : isLoadingEntities ? (
-          <SkeletonEntityList count={skeletonCount} />
-        ) : entities && entities.length === 0 ? (
-          <div className="text-center text-muted-foreground py-4">
-            {searchTerm
-              ? `No se encontraron entidades con el criterio de busqueda "${searchTerm}"`
-              : !searchTerm && !selectedEntityType
-              ? "Selecciona un tipo de entidad"
-              : "No hay entidades aún"}
-          </div>
-        ) : (
-          entities?.map((entity) => (
-            <EntityItem key={entity.id} entity={entity} />
-          ))
-        )}
+      <CardContent className="flex-1 min-h-0">
+        <div className="border rounded-lg h-full flex flex-col bg-muted">
+          <EntityList
+            entities={entities}
+            total={entitiesData?.total ?? 0}
+            isLoadingEntities={isLoadingEntities}
+            isLoadingTypes={isLoadingTypes}
+            searchTerm={searchTerm}
+            typesError={typesError}
+          />
+        </div>
       </CardContent>
       <CardFooter>
         <AnimatedPaginator

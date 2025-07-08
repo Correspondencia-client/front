@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Solo protege rutas privadas
-  const privateRoutePrefixes = ["/panel"];
+  const privateRoutePrefixes = ["/panel", "/gestion-usuarios"];
   const isPrivateRoute = privateRoutePrefixes.some((prefix) =>
     pathname.startsWith(prefix)
   );

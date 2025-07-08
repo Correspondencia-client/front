@@ -119,7 +119,7 @@ export function EntityContent() {
       <Card className="shadow-none border">
         <CardHeader>
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-            <div className="flex items-center gap-1">
+            <div className="flex flex-col md:flex-row items-center gap-1">
               <img
                 src={selectedEntity?.imgUrl}
                 alt={`Images de la entidad ${selectedEntity?.name}`}

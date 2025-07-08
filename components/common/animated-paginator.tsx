@@ -22,7 +22,7 @@ export function AnimatedPaginator({
   maxVisiblePages = 7,
   className,
 }: AnimatedPaginatorProps) {
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   const getVisiblePages = () => {
     if (totalPages <= maxVisiblePages) {

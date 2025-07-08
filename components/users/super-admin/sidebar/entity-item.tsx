@@ -16,7 +16,7 @@ export function EntityItem({ entity }: EntityItemProps) {
     <Button
       variant={selectedEntity?.id === entity.id ? "default" : "ghost"}
       onClick={() => setEntity(entity)}
-      className="h-14"
+      className="h-14 rounded-none w-full border-b"
     >
       <div className="flex items-center gap-3 w-full">
         <Image
