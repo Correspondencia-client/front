@@ -18,7 +18,6 @@ export const useEntitySelection = create<EntitySelectionState>()(
       setEntityType: (type) =>
         set({
           selectedEntityType: type,
-          selectedEntity: null,
         }),
       setEntity: (entity) =>
         set({

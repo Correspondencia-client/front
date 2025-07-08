@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import { UserFormValues } from "@/schemas/user";
 import { GetUsersByEntityParams, GetUsersByEntityResponse } from "@/types/user";
 
 export async function getUsersByEntity(
@@ -25,4 +26,18 @@ export async function getUsersByEntity(
       limit: 10,
     };
   }
+}
+
+export const createUser = async (data: UserFormValues, entityId: string) => {
+  const res = await api.post("/auth/register-officer", { ...data, entityId });
+  return res.data;
+};
+
+export const updateUser = async (id: string, data: UserFormValues) => {
+  const res = await api.patch(`/auth/${id}`, data);
+  return res.data;
+};
+
+export async function deleteUser(id: string): Promise<void> {
+  await api.delete(`/auth/${id}`);
 }

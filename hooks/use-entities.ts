@@ -1,9 +1,13 @@
+import {
+  ENTITIES_QUERY_KEY,
+  ENTITY_TYPES_QUERY_KEY,
+} from "@/constants/queries";
 import { getEntitiesByType, getEntityTypes } from "@/utils/entities";
 import { useQuery } from "@tanstack/react-query";
 
 export const useEntityTypes = () => {
   return useQuery({
-    queryKey: ["entityTypes"],
+    queryKey: [ENTITY_TYPES_QUERY_KEY],
     queryFn: () => getEntityTypes(),
   });
 };
@@ -15,7 +19,7 @@ export const useEntities = (params: {
   limit?: number;
 }) => {
   return useQuery({
-    queryKey: ["entities", params],
+    queryKey: [ENTITIES_QUERY_KEY, params],
     queryFn: () => getEntitiesByType(params),
     enabled: !!params.type,
   });

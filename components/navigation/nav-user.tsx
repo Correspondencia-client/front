@@ -22,21 +22,15 @@ import api from "@/lib/axios";
 import { useAuthStore } from "@/stores/auth-store";
 import { UserAvatar } from "@/components/common/user-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEntitySelection } from "@/stores/entity-selection";
 
 export function NavUser() {
   const router = useRouter();
-  const { user, clearUser } = useAuthStore();
-  const { clearSelection } = useEntitySelection();
+  const { user } = useAuthStore();
   const { isMobile } = useSidebar();
 
   const handleLogout = async () => {
     try {
       await api.get("/auth/logout");
-
-      // Reset store statuses
-      clearUser();
-      clearSelection();
 
       // Delete persistent storage
       localStorage.removeItem("auth-storage");

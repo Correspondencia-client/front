@@ -1,3 +1,5 @@
+import { Area } from "@/types/area";
+
 export interface User {
   id: string;
   fullName: string;
@@ -5,6 +7,7 @@ export interface User {
   active: boolean;
   isEmailVerified: boolean;
   role: string;
+  area: Area;
 }
 
 export interface GetUsersByEntityParams {

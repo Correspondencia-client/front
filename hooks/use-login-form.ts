@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAuthStore } from "@/stores/auth-store";
+import { useEntitySelection } from "@/stores/entity-selection";
 
 export function useLoginForm() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setUser, clearUser } = useAuthStore();
+  const { clearSelection } = useEntitySelection();
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -30,7 +32,8 @@ export function useLoginForm() {
         password: data.password,
       });
 
-      console.log(response);
+      clearSelection();
+      clearUser();
 
       setUser({
         email: response.data.email,
@@ -49,8 +52,6 @@ export function useLoginForm() {
           axiosError.message ??
           "Ocurrió un error inesperado.",
       });
-
-      console.error("Error al loguear usuario:", axiosError);
     }
   };
 
