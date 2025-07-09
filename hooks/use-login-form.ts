@@ -35,11 +35,21 @@ export function useLoginForm() {
       clearSelection();
       clearUser();
 
+      const { email, fullName, id, role, entity, area } = response.data;
+
       setUser({
-        email: response.data.email,
-        fullName: response.data.fullName,
-        id: response.data.id,
-        role: response.data.role,
+        email,
+        fullName,
+        id,
+        role,
+        entity: entity
+          ? {
+              id: entity.id,
+              name: entity.name,
+              imageUrl: entity.imageUrl,
+            }
+          : undefined,
+        area: area ?? undefined,
       });
       router.push("/panel");
       form.reset();

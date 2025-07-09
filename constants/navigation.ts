@@ -1,4 +1,5 @@
 import {
+  Building,
   HelpCircleIcon,
   LayoutDashboardIcon,
   SettingsIcon,
@@ -21,6 +22,11 @@ export const routes = {
     },
   ],
   administrationSuperAdmin: [
+    {
+      name: "Gestión de areas",
+      url: "/gestion-areas/superadmin",
+      icon: Building,
+    },
     {
       name: "Gestión de usuarios",
       url: "/gestion-usuarios/superadmin",

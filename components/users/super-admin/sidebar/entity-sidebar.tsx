@@ -11,21 +11,16 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { AnimatedPaginator } from "@/components/common/animated-paginator";
-import { EntityItem } from "@/components/users/super-admin/sidebar/entity-item";
 import { EntityTypeSelect } from "@/components/users/super-admin/sidebar/entity-type-select";
-import { SkeletonEntityList } from "@/components/users/super-admin/skeletons/skeleton-entity-list";
-import { Inbox, Search } from "lucide-react";
-import { EmptySidebarEntities } from "../states/empty-sidebar-entities";
 import { EntityList } from "./entity-list";
 import { cn } from "@/lib/utils";
 
 export function EntitySidebar() {
   const limit = 10;
-  const skeletonCount = 4;
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { selectedEntityType } = useEntitySelection();
+  const { selectedEntityType, selectedEntity } = useEntitySelection();
 
   const {
     data: entityTypes = { types: [] },
@@ -64,7 +59,7 @@ export function EntitySidebar() {
           />
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className={cn(!selectedEntity && "hidden")}>
         <AnimatedPaginator
           currentPage={currentPage}
           onPageChange={setCurrentPage}

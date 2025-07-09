@@ -1,5 +1,4 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-
 import { usePagination } from "@/hooks/use-pagination";
 import {
   Pagination,
@@ -31,8 +30,8 @@ export function Paginator({
   totalPages,
   paginationItemsToDisplay = 5,
   limit,
-  onLimitChange,
   onPageChange,
+  onLimitChange,
 }: PaginationProps) {
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage,
@@ -41,21 +40,19 @@ export function Paginator({
   });
 
   return (
-    <div className="flex items-center justify-between gap-3">
-      {/* Page number information */}
-      <p
-        className="text-muted-foreground flex-1 text-sm whitespace-nowrap"
-        aria-live="polite"
-      >
-        Página <span className="text-foreground">{currentPage}</span> de{" "}
-        <span className="text-foreground">{totalPages}</span>
-      </p>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+      {/* Info de página y paginador juntos en móviles */}
+      <div className="flex items-center justify-between gap-2 w-full">
+        {/* Información de página */}
+        <p className="text-muted-foreground text-sm whitespace-nowrap">
+          Página <span className="text-foreground">{currentPage}</span> de{" "}
+          <span className="text-foreground">{totalPages}</span>
+        </p>
 
-      {/* Pagination */}
-      <div className="grow">
-        <Pagination>
-          <PaginationContent>
-            {/* Previous page button */}
+        {/* Paginador */}
+        <Pagination className="max-sm:justify-end">
+          <PaginationContent className="flex-wrap">
+            {/* Botón anterior */}
             <PaginationItem>
               <PaginationLink
                 onClick={() => onPageChange(currentPage - 1)}
@@ -69,14 +66,14 @@ export function Paginator({
               </PaginationLink>
             </PaginationItem>
 
-            {/* Left ellipsis (...) */}
+            {/* Ellipsis izquierda */}
             {showLeftEllipsis && (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
             )}
 
-            {/* Page number links */}
+            {/* Números de página */}
             {pages.map((page) => (
               <PaginationItem key={page}>
                 <PaginationLink
@@ -89,14 +86,14 @@ export function Paginator({
               </PaginationItem>
             ))}
 
-            {/* Right ellipsis (...) */}
+            {/* Ellipsis derecha */}
             {showRightEllipsis && (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
             )}
 
-            {/* Next page button */}
+            {/* Botón siguiente */}
             <PaginationItem>
               <PaginationLink
                 onClick={() => onPageChange(currentPage + 1)}
@@ -113,8 +110,8 @@ export function Paginator({
         </Pagination>
       </div>
 
-      {/* Results per page */}
-      <div className="flex flex-1 justify-end">
+      {/* Select: resultados por página, centrado abajo en móviles */}
+      <div className="flex justify-center sm:justify-end w-full sm:w-auto">
         <Select
           value={limit.toString()}
           onValueChange={(val) => onLimitChange(Number(val))}

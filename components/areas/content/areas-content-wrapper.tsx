@@ -1,11 +1,11 @@
 "use client";
 
 import { useEntitySelection } from "@/stores/entity-selection";
-import { EmptyEntityState } from "@/components/users/super-admin/states/empty-entity-state";
-import { EntityContent } from "@/components/users/super-admin/content/entity-content";
+import { AreasContent } from "@/components/areas/content/areas-content";
 import { MobileEntitySelector } from "@/components/common/mobile-entity-selector";
+import { EmptyEntityState } from "@/components/users/super-admin/states/empty-entity-state";
 
-export function EntityContentWrapper() {
+export function AreasContentWrapper() {
   const { selectedEntity } = useEntitySelection();
 
   return (
@@ -13,11 +13,11 @@ export function EntityContentWrapper() {
       <MobileEntitySelector />
       {!selectedEntity && (
         <EmptyEntityState
-          type="users"
-          description="Para gestionar los usuarios, primero debes seleccionar una entidad."
+          type="areas"
+          description="Para gestionar las áreas, primero debes seleccionar una entidad."
         />
       )}
-      {selectedEntity && <EntityContent />}
+      {selectedEntity && <AreasContent />}
     </div>
   );
 }

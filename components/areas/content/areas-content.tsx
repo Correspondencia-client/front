@@ -1,58 +1,56 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState } from "react";
-import { FilterSelect } from "@/components/common/filter-select";
+import { AxiosError } from "axios";
+
+import { Area } from "@/types/area";
 import { SearchInput } from "@/components/common/search-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ACTIVE_STATUS_OPTIONS,
-  EMAIL_VERIFIED_OPTIONS,
-} from "@/constants/entities";
-import { User } from "@/types/user";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { DataTable } from "@/components/ui/data-table";
-import { getUserColumns } from "@/components/users/super-admin/table/user-columns";
-import { useUsersByEntity } from "@/hooks/use-users";
-import { UserDialog } from "@/components/users/super-admin/content/user-dialog";
 import { Paginator } from "@/components/common/paginator";
-import { deleteUser } from "@/utils/users";
-import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
+import { AREAS_QUERY_KEY } from "@/constants/queries";
 import { AlertDialogConfirm } from "@/components/common/alert-dialog-confirm";
+import { AreaDialog } from "@/components/areas/content/area-dialog";
 import { useAreasByEntity } from "@/hooks/use-areas";
+import { getAreaColumns } from "@/components/areas/table/area-columns";
+import { deleteArea } from "@/utils/areas";
 
-interface UserFilters {
+interface AreaFilters {
   search: string;
-  isEmailVerified: string;
-  active: string;
   page: number;
   limit: number;
 }
 
-export function EntityContent() {
+export function AreasContent() {
   const queryClient = useQueryClient();
   const { selectedEntity } = useEntitySelection();
 
   // States for create and edit dialog
   const [openDialog, setOpenDialog] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const [areaToEdit, setAreaToEdit] = useState<Area | null>(null);
 
   // States for alert dialog
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [areaToDelete, setAreaToDelete] = useState<Area | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [filters, setFilters] = useState<UserFilters>({
+  const [filters, setFilters] = useState<AreaFilters>({
     search: "",
-    isEmailVerified: "all",
-    active: "all",
     page: 1,
     limit: 10,
   });
 
-  const updateFilters = (newFilters: Partial<UserFilters>) => {
+  const { data: areaData, isLoading } = useAreasByEntity({
+    entityId: selectedEntity!.id,
+    name: filters.search,
+    limit: filters.limit,
+    page: filters.page,
+  });
+
+  const updateFilters = (newFilters: Partial<AreaFilters>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
@@ -60,65 +58,46 @@ export function EntityContent() {
     }));
   };
 
-  const { data: usersData, isLoading } = useUsersByEntity({
-    entityId: selectedEntity?.id,
-    isEmailVerified:
-      filters.isEmailVerified === "true" || filters.isEmailVerified === "false"
-        ? filters.isEmailVerified
-        : undefined,
-    active:
-      filters.active === "true" || filters.active === "false"
-        ? filters.active
-        : undefined,
-    search: filters.search || undefined,
-    page: filters.page,
-    limit: filters.limit,
-  });
-
-  const { data: areasData } = useAreasByEntity({
-    entityId: selectedEntity!.id,
-  });
-
-  const handleNewUser = () => {
-    setUserToEdit(null); // create mode
+  const handleNewArea = () => {
+    setAreaToEdit(null); // create mode
     setOpenDialog(true);
   };
 
-  const handleEditUser = (user: User) => {
-    setUserToEdit(user); // edit mode
+  const handleEditArea = (area: Area) => {
+    setAreaToEdit(area); // edit mode
     setOpenDialog(true);
   };
 
   const handleDeleteUser = async () => {
-    if (!userToDelete) return;
+    if (!areaToDelete) return;
     setIsDeleting(true);
 
     try {
-      await deleteUser(userToDelete.id);
-      toast.success("Usuario eliminado correctamente");
-      queryClient.invalidateQueries({ queryKey: [USER_BY_ENTITY_QUERY_KEY] });
-      setUserToDelete(null);
+      await deleteArea(areaToDelete.id);
+      toast.success("Area eliminada correctamente");
+      queryClient.invalidateQueries({ queryKey: [AREAS_QUERY_KEY] });
+      setAreaToDelete(null);
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
-      toast.error(err.response?.data?.message || "Error al eliminar usuario");
+      toast.error(err.response?.data?.message || "Error al eliminar el area");
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const columns = getUserColumns(handleEditUser, setUserToDelete);
+  const columns = getAreaColumns(handleEditArea, setAreaToDelete);
 
   return (
     <>
       <AlertDialogConfirm
-        open={!!userToDelete}
+        open={!!areaToDelete}
         onClose={(open) => {
-          if (!open) setUserToDelete(null);
+          if (!open) setAreaToDelete(null);
         }}
         onConfirm={handleDeleteUser}
         loading={isDeleting}
-        title="Eliminar usuario"
-        description={`¿Estás seguro de que deseas eliminar a ${userToDelete?.fullName}? Esta acción no se puede deshacer.`}
+        title="Eliminar area"
+        description={`¿Estás seguro de que deseas eliminar el area ${areaToDelete?.name}? Esta acción no se puede deshacer.`}
       />
       <Card className="shadow-none border">
         <CardHeader>
@@ -131,14 +110,14 @@ export function EntityContent() {
               />
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  Usuarios - {selectedEntity?.name}
+                  Areas - {selectedEntity?.name}
                 </CardTitle>
                 <p className="text-sm text-gray-500 mt-1">
-                  Gestiona los usuarios de {selectedEntity?.name}
+                  Gestiona las areas de {selectedEntity?.name}
                 </p>
               </div>
             </div>
-            <Button onClick={handleNewUser}>Nuevo usuario</Button>
+            <Button onClick={handleNewArea}>Nueva area</Button>
           </div>
 
           {/* Filters */}
@@ -154,21 +133,6 @@ export function EntityContent() {
                 />
               </div>
             </div>
-
-            <FilterSelect
-              placeholder="Correo verificado"
-              options={EMAIL_VERIFIED_OPTIONS}
-              value={filters.isEmailVerified}
-              onValueChange={(value) =>
-                updateFilters({ isEmailVerified: value })
-              }
-            />
-            <FilterSelect
-              placeholder="Estado"
-              options={ACTIVE_STATUS_OPTIONS}
-              value={filters.active}
-              onValueChange={(value) => updateFilters({ active: value })}
-            />
           </div>
         </CardHeader>
 
@@ -176,11 +140,11 @@ export function EntityContent() {
           <DataTable
             isLoading={isLoading}
             columns={columns}
-            data={usersData?.users ?? []}
+            data={areaData?.areas ?? []}
           />
           <Paginator
             currentPage={filters.page}
-            totalPages={Math.ceil((usersData?.total ?? 0) / filters.limit)}
+            totalPages={Math.ceil((areaData?.total ?? 0) / filters.limit)}
             limit={filters.limit}
             onPageChange={(page) => updateFilters({ page })}
             onLimitChange={(limit) => updateFilters({ limit })}
@@ -189,11 +153,10 @@ export function EntityContent() {
       </Card>
 
       {/* Dialog to create and edit user */}
-      <UserDialog
+      <AreaDialog
         open={openDialog}
         onOpenChange={setOpenDialog}
-        userToEdit={userToEdit}
-        areas={areasData?.areas ?? []}
+        areaToEdit={areaToEdit}
       />
     </>
   );
