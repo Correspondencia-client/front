@@ -13,7 +13,6 @@ export function EntityContentWrapper() {
       <MobileEntitySelector />
       {!selectedEntity && (
         <EmptyEntityState
-          type="users"
           description="Para gestionar los usuarios, primero debes seleccionar una entidad."
         />
       )}

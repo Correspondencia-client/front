@@ -27,7 +27,7 @@ import {
 import { Area } from "@/types/area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AREAS_QUERY_KEY } from "@/constants/queries";
+import { AREAS_QUERY_KEY, ENTITIES_QUERY_KEY } from "@/constants/queries";
 import { createArea, updateArea } from "@/utils/areas";
 import { areaFormSchema, AreaFormValues } from "@/schemas/area";
 import { useEntitySelection } from "@/stores/entity-selection";
@@ -88,6 +88,10 @@ export function AreaDialog({
 
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: [AREAS_QUERY_KEY] });
+      queryClient.invalidateQueries({
+        queryKey: [ENTITIES_QUERY_KEY],
+        exact: false,
+      });
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
       toast.error(err.response?.data?.message || "Ocurrió un error inesperado");

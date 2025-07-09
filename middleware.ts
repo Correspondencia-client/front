@@ -9,9 +9,13 @@ const publicRoutes = [
   "/recuperar-clave",
 ];
 const rolePermissions: Record<string, string[]> = {
-  CITIZEN: ["/panel",],
+  CITIZEN: ["/panel"],
   ADMIN: ["/panel", "/gestion-usuarios/admin"],
-  SUPER: ["/panel", "/gestion-usuarios/superadmin"],
+  SUPER: [
+    "/panel",
+    "/gestion-usuarios/superadmin",
+    "/gestion-areas/superadmin",
+  ],
 };
 
 // No manipula headers ni cookies si no es necesario.
@@ -38,7 +42,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // Solo protege rutas privadas
-  const privateRoutePrefixes = ["/panel", "/gestion-usuarios"];
+  const privateRoutePrefixes = [
+    "/panel",
+    "/gestion-usuarios",
+    "/gestion-areas",
+    "/gestion-entidades",
+  ];
   const isPrivateRoute = privateRoutePrefixes.some((prefix) =>
     pathname.startsWith(prefix)
   );

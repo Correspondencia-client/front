@@ -12,10 +12,7 @@ export function AreasContentWrapper() {
     <div className="flex-1 h-full p-3 md:p-5 overflow-y-auto space-y-4 bg-sidebar">
       <MobileEntitySelector />
       {!selectedEntity && (
-        <EmptyEntityState
-          type="areas"
-          description="Para gestionar las áreas, primero debes seleccionar una entidad."
-        />
+        <EmptyEntityState description="Para gestionar las áreas, primero debes seleccionar una entidad." />
       )}
       {selectedEntity && <AreasContent />}
     </div>

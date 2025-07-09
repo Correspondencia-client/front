@@ -50,3 +50,23 @@ export const getEntitiesByType = async ({
     };
   }
 };
+
+export const createEntity = async (formData: FormData) => {
+  const response = await api.post("/entity", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
+export const updateEntity = async (id: string, formData: FormData) => {
+  const response = await api.patch(`/entity/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};

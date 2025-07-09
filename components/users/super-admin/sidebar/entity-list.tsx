@@ -39,20 +39,20 @@ export function EntityList({
       ) : entities && entities.length === 0 ? (
         <EmptySidebarEntities searchTerm={searchTerm} className="px-3 pt-6" />
       ) : (
-        entities?.map((entity) => (
-          <div key={entity.id} className="overflow-y-auto h-full">
-            <div className="rounded-lg bg-white h-full flex flex-col">
-              <div className="p-3 border-b bg-gray-50">
-                <p className="text-sm font-medium text-gray-700">
-                  Entidades encontradas ({total})
-                </p>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <EntityItem entity={entity} />
-              </div>
+        <div className="overflow-y-auto h-full">
+          <div className="rounded-lg bg-white h-full flex flex-col">
+            <div className="p-3 border-b bg-gray-50">
+              <p className="text-sm font-medium text-gray-700">
+                Entidades encontradas ({total})
+              </p>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {entities?.map((entity) => (
+                <EntityItem key={entity.id} entity={entity} />
+              ))}
             </div>
           </div>
-        ))
+        </div>
       )}
     </>
   );

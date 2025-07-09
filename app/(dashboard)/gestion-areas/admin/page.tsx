@@ -1,7 +1,7 @@
 import React from 'react'
 
-export function ManagementAreasAdminPage() {
+export default function ManagementAreasAdminPage() {
   return (
-    <div>ManagementAreasAdmin</div>
+    <div>ManagementAreasPage</div>
   )
 }
