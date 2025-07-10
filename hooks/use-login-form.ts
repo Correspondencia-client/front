@@ -9,11 +9,13 @@ import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEntitySelection } from "@/stores/entity-selection";
+import { useAreaSelection } from "@/stores/area-selection";
 
 export function useLoginForm() {
   const router = useRouter();
   const { setUser, clearUser } = useAuthStore();
   const { setEntity, clearSelection } = useEntitySelection();
+  const { clearArea } = useAreaSelection();
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -33,11 +35,10 @@ export function useLoginForm() {
       });
 
       clearSelection();
+      clearArea();
       clearUser();
 
       const { email, fullName, id, role, entity, area } = response.data;
-
-      console.log("ENTITY: ", entity);
 
       setUser({
         email,

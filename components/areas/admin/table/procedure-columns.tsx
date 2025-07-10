@@ -1,0 +1,65 @@
+import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Procedure } from "@/types/procedure";
+
+export function getProcedureColumns(
+  onEdit: (procedure: Procedure) => void,
+  onDelete: (procedure: Procedure) => void
+): ColumnDef<Procedure>[] {
+  return [
+    {
+      accessorKey: "name",
+      header: "Nombre",
+      cell: ({ row }) => <div className="font-medium">{row.original.name}</div>,
+    },
+    {
+      accessorKey: "description",
+      header: "Descripción",
+      cell: ({ row }) => (
+        <div className="line-clamp-2 max-w-xs text-muted-foreground">
+          {row.original.description}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "maxResponseDays",
+      header: "Días máx. de respuesta",
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.maxResponseDays}</div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(row.original)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              onClick={() => onDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4 mr-2 text-red-600" />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+}

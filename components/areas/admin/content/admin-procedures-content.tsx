@@ -1,10 +1,9 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 
-import { Area } from "@/types/area";
 import { SearchInput } from "@/components/common/search-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +13,13 @@ import { Paginator } from "@/components/common/paginator";
 import { useQueryClient } from "@tanstack/react-query";
 import { AREAS_QUERY_KEY, ENTITIES_QUERY_KEY } from "@/constants/queries";
 import { AlertDialogConfirm } from "@/components/common/alert-dialog-confirm";
-import { AreaDialog } from "@/components/areas/content/area-dialog";
 import { useAreasByEntity } from "@/hooks/use-areas";
-import { getAreaColumns } from "@/components/areas/table/area-columns";
 import { deleteArea } from "@/utils/areas";
+import { AreaSelect } from "@/components/areas/admin/content/area-select";
+import { useAreaSelection } from "@/stores/area-selection";
+import { ProcedureDialog } from "@/components/areas/admin/content/procedure-dialog";
+import { Procedure } from "@/types/procedure";
+import { getProcedureColumns } from "@/components/areas/admin/table/procedure-columns";
 
 interface AreaFilters {
   search: string;
@@ -25,16 +27,19 @@ interface AreaFilters {
   limit: number;
 }
 
-export function AreasContent() {
+export function AdminProceduresContent() {
   const queryClient = useQueryClient();
   const { selectedEntity } = useEntitySelection();
+  const { setArea, selectedArea } = useAreaSelection();
 
   // States for create and edit dialog
   const [openDialog, setOpenDialog] = useState(false);
-  const [areaToEdit, setAreaToEdit] = useState<Area | null>(null);
+  const [procedureToEdit, setProcedureToEdit] = useState<Procedure | null>(
+    null
+  );
 
   // States for alert dialog
-  const [areaToDelete, setAreaToDelete] = useState<Area | null>(null);
+  const [areaToDelete, setAreaToDelete] = useState<Procedure | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [filters, setFilters] = useState<AreaFilters>({
@@ -50,6 +55,12 @@ export function AreasContent() {
     page: filters.page,
   });
 
+  useEffect(() => {
+    if (areaData?.areas && areaData.areas.length > 0 && !selectedArea) {
+      setArea(areaData.areas[0]);
+    }
+  }, [areaData?.areas, selectedArea, setArea]);
+
   const updateFilters = (newFilters: Partial<AreaFilters>) => {
     setFilters((prev) => ({
       ...prev,
@@ -58,17 +69,17 @@ export function AreasContent() {
     }));
   };
 
-  const handleNewArea = () => {
-    setAreaToEdit(null); // create mode
+  const handleNewProcedure = () => {
+    setProcedureToEdit(null); // create mode
     setOpenDialog(true);
   };
 
-  const handleEditArea = (area: Area) => {
-    setAreaToEdit(area); // edit mode
+  const handleEditProcedure = (procedure: Procedure) => {
+    setProcedureToEdit(procedure); // edit mode
     setOpenDialog(true);
   };
 
-  const handleDeleteArea = async () => {
+  const handleDeleteProcedure = async () => {
     if (!areaToDelete) return;
     setIsDeleting(true);
 
@@ -89,7 +100,7 @@ export function AreasContent() {
     }
   };
 
-  const columns = getAreaColumns(handleEditArea, setAreaToDelete);
+  const columns = getProcedureColumns(handleEditProcedure, setAreaToDelete);
 
   return (
     <>
@@ -98,14 +109,14 @@ export function AreasContent() {
         onClose={(open) => {
           if (!open) setAreaToDelete(null);
         }}
-        onConfirm={handleDeleteArea}
+        onConfirm={handleDeleteProcedure}
         loading={isDeleting}
-        title="Eliminar area"
-        description={`¿Estás seguro de que deseas eliminar el area ${areaToDelete?.name}? Esta acción no se puede deshacer.`}
+        title="Eliminar procedimiento"
+        description={`¿Estás seguro de que deseas eliminar el procedimiento ${areaToDelete?.name}? Esta acción no se puede deshacer.`}
       />
       <Card className="shadow-none border">
-        <CardHeader>
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div className="flex flex-col md:flex-row items-center gap-1">
               <img
                 src={selectedEntity?.imgUrl}
@@ -114,38 +125,32 @@ export function AreasContent() {
               />
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  Areas - {selectedEntity?.name}
+                  Procesos - {selectedEntity?.name}
                 </CardTitle>
                 <p className="text-sm text-gray-500 mt-1">
-                  Gestiona las areas de {selectedEntity?.name}
+                  Gestiona los procedimientos de {selectedEntity?.name}
                 </p>
               </div>
             </div>
-            <Button onClick={handleNewArea}>Nueva area</Button>
           </div>
 
+          <AreaSelect areas={areaData?.areas ?? []} />
+
           {/* Filters */}
-          <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex-1 min-w-64">
-              <div className="relative">
-                <SearchInput
-                  searchTerm={filters.search}
-                  placeholder="Buscar por nombre..."
-                  onSearch={(searchTerm) =>
-                    updateFilters({ search: searchTerm })
-                  }
-                />
-              </div>
+          <div className="flex flex-wrap justify-between gap-4">
+            <div className="lg:min-w-[300px] max-lg:w-full">
+              <SearchInput
+                searchTerm={filters.search}
+                placeholder="Buscar por nombre..."
+                onSearch={(searchTerm) => updateFilters({ search: searchTerm })}
+              />
             </div>
+            <Button onClick={handleNewProcedure} className="max-lg:w-full">Nuevo procedimiento</Button>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <DataTable
-            isLoading={isLoading}
-            columns={columns}
-            data={areaData?.areas ?? []}
-          />
+          <DataTable isLoading={isLoading} columns={columns} data={[]} />
           <Paginator
             currentPage={filters.page}
             totalPages={Math.ceil((areaData?.total ?? 0) / filters.limit)}
@@ -157,10 +162,10 @@ export function AreasContent() {
       </Card>
 
       {/* Dialog to create and edit user */}
-      <AreaDialog
+      <ProcedureDialog
         open={openDialog}
         onOpenChange={setOpenDialog}
-        areaToEdit={areaToEdit}
+        procedureToEdit={procedureToEdit}
       />
     </>
   );

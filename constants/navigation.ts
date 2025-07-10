@@ -17,7 +17,7 @@ export const routes = {
   ],
   administrationAdmin: [
     {
-      name: "Gestión de areas",
+      name: "Áreas y tipos de procesos",
       url: "/gestion-areas/admin",
       icon: Building,
     },
@@ -29,7 +29,7 @@ export const routes = {
   ],
   administrationSuperAdmin: [
     {
-      name: "Gestión de areas",
+      name: "Gestión de áreas",
       url: "/gestion-areas/superadmin",
       icon: Building,
     },
