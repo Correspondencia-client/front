@@ -13,7 +13,7 @@ import { useEntitySelection } from "@/stores/entity-selection";
 export function useLoginForm() {
   const router = useRouter();
   const { setUser, clearUser } = useAuthStore();
-  const { clearSelection } = useEntitySelection();
+  const { setEntity, clearSelection } = useEntitySelection();
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -37,6 +37,8 @@ export function useLoginForm() {
 
       const { email, fullName, id, role, entity, area } = response.data;
 
+      console.log("ENTITY: ", entity);
+
       setUser({
         email,
         fullName,
@@ -46,11 +48,28 @@ export function useLoginForm() {
           ? {
               id: entity.id,
               name: entity.name,
-              imageUrl: entity.imageUrl,
+              imageUrl: entity.imgUrl,
             }
           : undefined,
         area: area ?? undefined,
       });
+
+      // Guardar entidad en la selección (si existe)
+      if (entity) {
+        setEntity({
+          id: entity.id,
+          name: entity.name,
+          imgUrl: entity.imgUrl,
+          active: entity.active,
+          areas: [],
+          createdAt: entity.createdAt,
+          description: entity.description,
+          phone: entity.phone,
+          type: entity.type,
+          updatedAt: "",
+        });
+      }
+
       router.push("/panel");
       form.reset();
     } catch (error) {

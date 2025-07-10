@@ -1,9 +1,5 @@
 export const userRoles = [
   {
-    value: "CITIZEN",
-    label: "Ciudadano",
-  },
-  {
     value: "OFFICER",
     label: "Funcionario",
   },

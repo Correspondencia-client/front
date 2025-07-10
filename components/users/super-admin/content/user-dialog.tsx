@@ -40,6 +40,7 @@ import { userRoles } from "@/constants/user";
 import { USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { AxiosError } from "axios";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface UserDialogProps {
   open: boolean;
@@ -57,6 +58,7 @@ export function UserDialog({
   const queryClient = useQueryClient();
   const isEditMode = !!userToEdit;
 
+  const { user } = useAuthStore()
   const { selectedEntity } = useEntitySelection();
 
   const form = useForm<UserFormValues>({
@@ -74,7 +76,7 @@ export function UserDialog({
       form.reset({
         fullName: userToEdit.fullName,
         email: userToEdit.email,
-        role: userToEdit.role as "ADMIN" | "OFFICER" | "CITIZEN",
+        role: userToEdit.role as "ADMIN" | "OFFICER",
         areaId: userToEdit.area?.id ?? "",
       });
     } else {
@@ -171,7 +173,7 @@ export function UserDialog({
               )}
             />
 
-            <FormField
+            {user?.role === "SUPER" && <FormField
               control={form.control}
               name="role"
               render={({ field }) => (
@@ -199,7 +201,7 @@ export function UserDialog({
                   </FormDescription>
                 </FormItem>
               )}
-            />
+            />}
 
             <FormField
               control={form.control}
@@ -207,7 +209,7 @@ export function UserDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Área <RequiredDot />
+                    Área
                   </FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>

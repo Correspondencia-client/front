@@ -7,7 +7,7 @@ export async function getAreasByEntity(
   params: GetAreasByEntityParams
 ): Promise<GetAreasByEntityResponse> {
   try {
-    const response = await api.get("/area", {
+    const response = await api.get(`/area/entity/${params.entityId}`, {
       params,
     });
 
