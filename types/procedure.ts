@@ -4,3 +4,11 @@ export interface Procedure {
   description: string;
   maxResponseDays: number;
 }
+
+export interface GetProceduresByAreaParams {
+  areaId: string;
+}
+
+export interface GetProceduresByAreaResponse {
+  procedures: Procedure[];
+}

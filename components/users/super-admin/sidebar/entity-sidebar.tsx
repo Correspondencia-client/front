@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { SearchInput } from "@/components/common/search-input";
 import { useEntities, useEntityTypes } from "@/hooks/use-entities";
@@ -20,7 +20,8 @@ export function EntitySidebar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { selectedEntityType, selectedEntity } = useEntitySelection();
+  const { selectedEntityType, selectedEntity, setEntityType, setEntity } =
+    useEntitySelection();
 
   const {
     data: entityTypes = { types: [] },
@@ -36,6 +37,18 @@ export function EntitySidebar() {
   });
 
   const entities = entitiesData?.entities ?? [];
+
+  useEffect(() => {
+    if (!selectedEntityType && entityTypes.types.length > 0) {
+      setEntityType(entityTypes.types[0]);
+    }
+  }, [entityTypes.types, selectedEntityType, setEntityType]);
+
+  useEffect(() => {
+    if (!selectedEntity && entities.length > 0) {
+      setEntity(entities[0]);
+    }
+  }, [entities, selectedEntity, setEntity]);
 
   return (
     <Card className="hidden md:flex w-80 h-full shrink-0 rounded-none border-r">

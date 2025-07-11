@@ -29,7 +29,15 @@ export async function getUsersByEntity(
 }
 
 export const createUser = async (data: UserFormValues, entityId: string) => {
-  const res = await api.post("/auth/register-officer", { ...data, entityId });
+  const payload = {
+    fullName: data.fullName,
+    email: data.email,
+    role: data.role,
+    entityId,
+    ...(data.areaId && { areaId: data.areaId }),
+  };
+
+  const res = await api.post("/auth/register-officer", payload);
   return res.data;
 };
 

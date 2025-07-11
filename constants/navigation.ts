@@ -17,14 +17,14 @@ export const routes = {
   ],
   administrationAdmin: [
     {
-      name: "Áreas y tipos de procesos",
-      url: "/gestion-areas/admin",
-      icon: Building,
-    },
-    {
       name: "Gestión de usuarios",
       url: "/gestion-usuarios/admin",
       icon: UsersIcon,
+    },
+    {
+      name: "Áreas y tipos de procesos",
+      url: "/gestion-areas/admin",
+      icon: Building,
     },
   ],
   administrationSuperAdmin: [

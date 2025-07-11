@@ -95,7 +95,7 @@ export function ProcedureDialog({
   const onSubmit = async (data: ProcedureFormValues) => {
     try {
       if (isEditMode) {
-        await updateProcedure(procedureToEdit!.id, data);
+        await updateProcedure(procedureToEdit!.id, selectedArea!.id, data);
         toast.success("Procedimiento actualizado correctamente");
       } else {
         await createProcedure(data, selectedEntity!.id, selectedArea!.id);
