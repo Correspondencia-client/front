@@ -19,7 +19,15 @@ import { EntityList } from "@/components/users/super-admin/sidebar/entity-list";
 import { EntityTypeSelect } from "@/components/users/super-admin/sidebar/entity-type-select";
 import { AnimatedPaginator } from "./animated-paginator";
 
-export function MobileEntitySelector() {
+interface MobileEntitySelectorProps {
+  title?: string;
+  description?: string;
+}
+
+export function MobileEntitySelector({
+  title,
+  description,
+}: MobileEntitySelectorProps) {
   const limit = 10;
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,11 +119,12 @@ export function MobileEntitySelector() {
                   {/* Header */}
                   <div className="space-y-2">
                     <SheetTitle className="text-lg font-semibold">
-                      Seleccionar entidad
+                      {title ? title : "Seleccionar entidad"}
                     </SheetTitle>
                     <SheetDescription className="text-sm text-gray-600">
-                      Busca y selecciona la entidad a la que necesitas gestionar
-                      sus usuarios
+                      {description
+                        ? description
+                        : "Busca y selecciona la entidad a la que necesitas gestionar sus usuarios"}
                     </SheetDescription>
                   </div>
 

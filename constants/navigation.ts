@@ -5,6 +5,8 @@ import {
   LayoutDashboardIcon,
   SettingsIcon,
   UsersIcon,
+  FileText,
+  PlusCircle
 } from "lucide-react";
 
 export const routes = {
@@ -13,6 +15,16 @@ export const routes = {
       title: "Inicio",
       url: "/panel",
       icon: LayoutDashboardIcon,
+    },
+    {
+      title: "Nueva solicitud",
+      url: "/solicitudes/ciudadano/nueva-solicitud",
+      icon: PlusCircle,
+    },
+    {
+      title: "Mis solicitudes",
+      url: "/solicitudes/ciudadano/mis-solicitudes",
+      icon: FileText,
     },
   ],
   administrationAdmin: [

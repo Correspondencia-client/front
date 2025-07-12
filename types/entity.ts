@@ -1,4 +1,5 @@
 import { Area } from "@/types/area";
+import { Procedure } from "./procedure";
 
 export interface EntityType {
   types: string[];
@@ -15,6 +16,7 @@ export interface Entity {
   createdAt: string;
   updatedAt: string;
   areas: Area[];
+  procedures?: Procedure[]
 }
 
 export interface EntitiesResponse {

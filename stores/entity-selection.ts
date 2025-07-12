@@ -8,6 +8,7 @@ interface EntitySelectionState {
   setEntityType: (type: string) => void;
   setEntity: (entity: Entity) => void;
   clearSelection: () => void;
+  clearEntity: () => void;
 }
 
 export const useEntitySelection = create<EntitySelectionState>()(
@@ -26,6 +27,10 @@ export const useEntitySelection = create<EntitySelectionState>()(
       clearSelection: () =>
         set({
           selectedEntityType: "",
+          selectedEntity: null,
+        }),
+      clearEntity: () =>
+        set({
           selectedEntity: null,
         }),
     }),
