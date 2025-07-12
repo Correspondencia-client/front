@@ -6,11 +6,18 @@ import {
   SettingsIcon,
   UsersIcon,
   FileText,
-  PlusCircle
+  PlusCircle,
 } from "lucide-react";
 
 export const routes = {
   navMain: [
+    {
+      title: "Inicio",
+      url: "/panel",
+      icon: LayoutDashboardIcon,
+    },
+  ],
+  citizenNavMain: [
     {
       title: "Inicio",
       url: "/panel",
@@ -24,6 +31,27 @@ export const routes = {
     {
       title: "Mis solicitudes",
       url: "/solicitudes/ciudadano/mis-solicitudes",
+      icon: FileText,
+    },
+  ],
+  officerNavMain: [
+    {
+      title: "Inicio",
+      url: "/panel",
+      icon: LayoutDashboardIcon,
+    },
+  ],
+  navMainAdminAndSuperAdmin: [
+    {
+      title: "Inicio",
+      url: "/panel",
+      icon: LayoutDashboardIcon,
+    },
+  ],
+  administrationOfficer: [
+    {
+      name: "Solicitudes asignadas",
+      url: "/solicitudes/funcionario/mis-asignaciones",
       icon: FileText,
     },
   ],

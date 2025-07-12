@@ -92,7 +92,7 @@ export function EntitiesContent() {
           <EntityTypeSelect entityTypes={entityTypes.types} />
           <div
             className={cn(
-              "flex flex-wrap gap-4",
+              "flex max-sm:flex-col flex-wrap gap-4",
               !selectedEntityType && "hidden"
             )}
           >

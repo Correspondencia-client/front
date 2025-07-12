@@ -121,7 +121,7 @@ export function AreaDialog({
                     Nombre del area <RequiredDot />
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Nombre del usuario" {...field} />
+                    <Input placeholder="Nombre del area" {...field} />
                   </FormControl>
                   <FormMessage />
                   <FormDescription>
