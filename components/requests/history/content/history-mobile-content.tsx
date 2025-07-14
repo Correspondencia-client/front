@@ -3,17 +3,28 @@ import { useRequestHistory } from "@/hooks/use-requests";
 import { History } from "lucide-react";
 import { RequestHistoryItem } from "./request-history-item";
 import { RequestHistoryItemSkeleton } from "../skeletons/request-history-item-skeleton";
+import { useState } from "react";
 
 interface HistoryContentProps {
   requestId: string;
 }
 
-export function HistoryContent({ requestId }: HistoryContentProps) {
+export default function HistoryMobileContent({
+  requestId,
+}: HistoryContentProps) {
   const { data: history = [], isLoading: isLoadingHisotry } =
     useRequestHistory(requestId);
 
+  const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
+    null
+  );
+
+  const toggleRequest = (id: string) => {
+    setExpandedRequestId((prevId) => (prevId === id ? null : id));
+  };
+
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="block md:hidden space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <History className="h-6 w-6" />
@@ -49,7 +60,13 @@ export function HistoryContent({ requestId }: HistoryContentProps) {
       {!isLoadingHisotry && history.length > 0 && (
         <div className="space-y-6">
           {history.map((item) => (
-            <RequestHistoryItem key={item.id} item={item} />
+            <RequestHistoryItem
+              type="Mobile"
+              key={item.id}
+              item={item}
+              isExpanded={expandedRequestId === item.id}
+              onToggle={() => toggleRequest(item.id)}
+            />
           ))}
         </div>
       )}

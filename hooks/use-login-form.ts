@@ -10,11 +10,13 @@ import { AxiosError } from "axios";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { useAreaSelection } from "@/stores/area-selection";
+import { useHistoryStore } from "@/stores/history-store";
 
 export function useLoginForm() {
   const router = useRouter();
   const { setUser, clearUser } = useAuthStore();
   const { setEntity, clearSelection } = useEntitySelection();
+  const { clearHistoryItem } = useHistoryStore();
   const { clearArea } = useAreaSelection();
 
   const form = useForm<LoginData>({
@@ -37,6 +39,7 @@ export function useLoginForm() {
       clearSelection();
       clearArea();
       clearUser();
+      clearHistoryItem();
 
       const { email, fullName, id, role, entity, area } = response.data;
 

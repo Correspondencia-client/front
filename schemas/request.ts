@@ -58,6 +58,7 @@ export const replyRequestFormSchema = z.object({
     })
     .min(10, "La descripción debe tener al menos 10 caracteres.")
     .max(5000, "La descripción no puede exceder 5000 caracteres."),
+  aiPrompt: z.string().optional(),
   attachment: z
     .any()
     .optional()

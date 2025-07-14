@@ -92,7 +92,14 @@ export function RequestDetailModal({
   }
 
   const statusConfig = estadosConfig[request.status] || {
-    titulo: request.status,
+    titulo:
+      request.status === "IN_REVIEW"
+        ? "En Revisión"
+        : request.status === "COMPLETED"
+        ? "Completada"
+        : request.status === "PENDING"
+        ? "Pendiente"
+        : "Vencida",
     badgeColor: "bg-gray-100 text-gray-800",
     icon: Tag, // Icono por defecto
   };
@@ -188,7 +195,6 @@ export function RequestDetailModal({
                 dangerouslySetInnerHTML={{ __html: request.content.texto }}
               />
             </div>
-
             {/* Sección de Documentos Adjuntos */}
             {request.Document && request.Document.length > 0 && (
               <div className="rounded-lg border bg-card p-4 shadow-sm">

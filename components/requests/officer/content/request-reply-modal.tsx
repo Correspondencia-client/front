@@ -23,8 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Send, Paperclip, X, Loader } from "lucide-react";
-import { useState, useCallback } from "react"; // Importar useCallback
+import { Send, Paperclip, X, Loader, Wand2 } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react"; // Importar useCallback
 import { RichTextEditor } from "@/components/common/rich-text-editor";
 import { AssignedRequestItem } from "@/types/requests";
 import {
@@ -38,6 +38,8 @@ import {
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
 } from "@/constants/queries";
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 
 interface ReplyModalProps {
   isOpen: boolean;
@@ -57,12 +59,80 @@ export function RequestReplyModal({
     defaultValues: {
       title: "",
       description: "",
+      aiPrompt: "",
     },
   });
 
   const { isValid, isSubmitting } = form.formState;
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
+  const mounted = useRef(false); // Ref para rastrear si el componente está montado
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const handleGenerateWithAI = async () => {
+    const prompt = form.getValues("aiPrompt");
+    if (!prompt) {
+      if (mounted.current) {
+        // Verificar si el componente está montado
+        form.setError("aiPrompt", {
+          message: "Por favor, ingresa un prompt para generar el documento.",
+        });
+      }
+      return;
+    }
+
+    if (mounted.current) {
+      // Verificar si el componente está montado
+      setIsGeneratingAI(true);
+      form.clearErrors("aiPrompt"); // Limpiar errores previos del prompt
+    }
+
+    try {
+      const { text } = await generateText({
+        model: google("gemini-1.5-pro", {
+          apiKey: process.env.GEMINI_API_KEY, // Pasar la API key manualmente
+        }),
+        prompt: `Genera un documento especializado o una respuesta detallada para una solicitud administrativa, basándote en el siguiente prompt: "${prompt}". Asegúrate de que el contenido sea formal, claro y conciso, adecuado para una comunicación oficial.`,
+        system:
+          "Eres un asistente experto en redacción de documentos administrativos y respuestas a solicitudes. Tu objetivo es generar contenido profesional y preciso.",
+      });
+
+      console.log("Texto generado por IA:", text); // Para depuración
+
+      if (mounted.current) {
+        // Verificar si el componente está montado antes de actualizar
+        form.setValue("description", text, { shouldValidate: true });
+        form.setValue("aiPrompt", ""); // Limpiar el prompt después de generar
+      }
+    } catch (error: any) {
+      console.error("Error al generar con IA:", error);
+      let errorMessage =
+        "Error al generar el documento con IA. Inténtalo de nuevo.";
+      if (error.message && error.message.includes("API key")) {
+        errorMessage =
+          "Error de autenticación con la IA. Asegúrate de que tu GOOGLE_API_KEY esté configurada correctamente en Vercel.";
+      } else if (error.message) {
+        errorMessage = `Error de IA: ${error.message}`;
+      }
+      if (mounted.current) {
+        // Verificar si el componente está montado antes de actualizar
+        form.setError("aiPrompt", { message: errorMessage });
+      }
+    } finally {
+      if (mounted.current) {
+        // Verificar si el componente está montado antes de actualizar
+        setIsGeneratingAI(false);
+      }
+    }
+  };
 
   // Función para manejar la eliminación de un archivo individual
   const handleRemoveFile = useCallback(
@@ -146,6 +216,49 @@ export function RequestReplyModal({
                 </FormItem>
               )}
             />
+
+            {/* Sección de Generación con IA */}
+            <div className="rounded-lg border bg-card p-4 shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Wand2 className="h-5 w-5 text-purple-600" />
+                Generar con IA
+              </h3>
+              <FormField
+                control={form.control}
+                name="aiPrompt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prompt para IA</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ej: Genera una respuesta formal sobre el estado de la solicitud de presupuesto."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Describe el tipo de documento o respuesta que deseas que
+                      la IA genere.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                onClick={handleGenerateWithAI}
+                className="mt-4 w-full"
+                disabled={isGeneratingAI}
+              >
+                {isGeneratingAI ? (
+                  <>Generando...</>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Generar con IA
+                  </>
+                )}
+              </Button>
+            </div>
 
             {/* Campo de Descripción (Rich Text Editor) */}
             <FormField
