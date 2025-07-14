@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/:path*",
+        source: "/api/:path*",
         // destination: "https://apico.eduadminsoft.shop/:path*",
-        destination: "http://localhost:3001/:path*",
+        destination: "http://localhost:3001/api/:path*",
       },
     ];
   },

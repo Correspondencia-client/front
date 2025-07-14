@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowRightLeft, Eye, Clock, Reply } from "lucide-react";
+import { ArrowRightLeft, Eye, Clock, Reply, CheckCircle } from "lucide-react";
 import { AssignedRequestItem } from "@/types/requests";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -17,6 +17,7 @@ export function formatDate(dateString: string): string {
 export function getAssignedRequestColumns(
   onView: (request: AssignedRequestItem) => void,
   onReply?: (request: AssignedRequestItem) => void,
+  onComplete?: (request: AssignedRequestItem) => void,
   onTransfer?: (request: AssignedRequestItem) => void
 ): ColumnDef<AssignedRequestItem>[] {
   return [
@@ -81,7 +82,11 @@ export function getAssignedRequestColumns(
               <Button
                 variant="default"
                 size="sm"
-                className={cn(row.original.status === "IN_REVIEW" && "hidden")}
+                className={cn(
+                  (row.original.status === "IN_REVIEW" ||
+                    row.original.status === "COMPLETED") &&
+                    "hidden"
+                )}
                 onClick={() => onReply(row.original)}
               >
                 <Reply className="h-4 w-4 mr-1" />
@@ -95,9 +100,24 @@ export function getAssignedRequestColumns(
                 )}
               >
                 <Reply className="h-4 w-4 mr-1" />
-                Ver historial
+                Historial
               </Link>
             </>
+          )}
+
+          {onComplete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "text-green-700 hover:text-green-900",
+                row.original.status !== "IN_REVIEW" && "hidden"
+              )}
+              onClick={() => onComplete(row.original)}
+            >
+              <CheckCircle className="h-4 w-4 mr-1" />
+              Completar
+            </Button>
           )}
 
           {onTransfer && (
