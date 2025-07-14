@@ -63,3 +63,49 @@ export interface AssignedRequestsResponse {
   page: number;
   limit: number;
 }
+
+export interface RequestHistoryUser {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+}
+
+export interface RequestHistoryArea {
+  id: string;
+  name: string;
+}
+
+export interface RequestHistoryItem {
+  id: string;
+  type: string;
+  message: string;
+  createdAt: string;
+  requestId: string;
+
+  // Contenido enriquecido (puede ser null)
+  data?: {
+    texto: string;
+  } | null;
+
+  // Documentos adjuntos
+  Document: DocumentItem[];
+
+  // Usuario que hizo la acción
+  updatedBy: RequestHistoryUser;
+
+  // Áreas involucradas
+  fromArea?: RequestHistoryArea | null;
+  toArea?: RequestHistoryArea | null;
+
+  fromAreaId?: string | null;
+  toAreaId?: string | null;
+
+  updatedById: string;
+
+  createdBy?: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+}

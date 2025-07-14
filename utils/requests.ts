@@ -5,8 +5,10 @@ import {
 } from "@/schemas/request";
 import {
   ApiAssignedRequestsResponse,
+  AssignedRequestItem,
   AssignedRequestParams,
   AssignedRequestsResponse,
+  RequestHistoryItem,
   RequestStatus,
 } from "@/types/requests";
 
@@ -99,5 +101,11 @@ export const createCitizenRequest = async (data: CitizenRequestFormValues) => {
     },
   });
 
+  return response.data;
+};
+
+export const getRequestHistory = async (requestId: string): Promise<RequestHistoryItem[]> => {
+  const response = await api.get(`/requests/${requestId}/history`);
+  console.log("HISTORY RESPONSE", response.data);
   return response.data;
 };
