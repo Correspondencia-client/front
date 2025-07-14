@@ -37,8 +37,10 @@ import { createCitizenRequest } from "@/utils/requests";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Loader, Send } from "lucide-react";
+import { Loader, Paperclip, Send, X } from "lucide-react";
 import { MobileEntitySelector } from "@/components/common/mobile-entity-selector";
+import { useCallback, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 export function CitizenRequestContent() {
   const { selectedEntity } = useEntitySelection();
@@ -52,6 +54,34 @@ export function CitizenRequestContent() {
     },
   });
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Función para manejar la eliminación de un archivo individual
+  const handleRemoveFile = useCallback(
+    (fileToRemove: File) => {
+      const updatedFiles = selectedFiles.filter(
+        (file) => file !== fileToRemove
+      );
+      setSelectedFiles(updatedFiles);
+
+      // Crear un nuevo FileList para actualizar el campo del formulario
+      const dataTransfer = new DataTransfer();
+      updatedFiles.forEach((file) => dataTransfer.items.add(file));
+      form.setValue("attachment", dataTransfer.files);
+
+      // Si no quedan archivos, resetear el input de archivo para permitir re-selección
+      if (updatedFiles.length === 0) {
+        const inputElement = document.getElementById(
+          "attachment-upload"
+        ) as HTMLInputElement;
+        if (inputElement) {
+          inputElement.value = "";
+        }
+      }
+    },
+    [selectedFiles, form]
+  );
+
   const { isValid, isSubmitting } = form.formState;
 
   const onSubmit = async (values: CitizenRequestFormValues) => {
@@ -59,6 +89,7 @@ export function CitizenRequestContent() {
       await createCitizenRequest(values);
       toast.success("Solicitud enviada correctamente");
       form.reset();
+      setSelectedFiles([]); // Limpiar los archivos seleccionados
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
 
@@ -180,6 +211,137 @@ export function CitizenRequestContent() {
                     <FormDescription>
                       Use las herramientas de formato para estructurar mejor su
                       solicitud. Mínimo 10 caracteres, máximo 5000.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="attachment"
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
+                    <FormControl>
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="attachment-upload"
+                          className="flex min-h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-gray-600 transition-colors hover:border-gray-400 hover:bg-gray-100"
+                        >
+                          {selectedFiles.length > 0 ? (
+                            <div className="flex flex-col items-center gap-1 p-2">
+                              <p className="text-sm font-medium mb-1">
+                                Archivos seleccionados:
+                              </p>
+                              <div className="flex flex-wrap justify-center gap-2">
+                                {selectedFiles.map((file, index) => (
+                                  <Badge
+                                    key={file.name + file.size + index} // Usar una clave más robusta
+                                    variant="secondary"
+                                    className="flex items-center gap-1 pr-1 text-sm"
+                                  >
+                                    <Paperclip className="h-3 w-3" />
+                                    {file.name}
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-5 w-5 text-gray-500 hover:text-gray-700"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation(); // Evitar que se dispare el evento del label
+                                        handleRemoveFile(file);
+                                      }}
+                                    >
+                                      <X className="h-3 w-3" />
+                                      <span className="sr-only">
+                                        Eliminar {file.name}
+                                      </span>
+                                    </Button>
+                                  </Badge>
+                                ))}
+                              </div>
+                              <Button
+                                type="button"
+                                variant="link"
+                                size="sm"
+                                className="mt-2 text-blue-600 hover:text-blue-800"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  onChange(undefined); // Limpiar el valor del campo
+                                  setSelectedFiles([]); // Limpiar el array de archivos
+                                  const inputElement = document.getElementById(
+                                    "attachment-upload"
+                                  ) as HTMLInputElement;
+                                  if (inputElement) {
+                                    inputElement.value = ""; // Resetear el input de archivo
+                                  }
+                                }}
+                              >
+                                <Paperclip className="h-4 w-4 mr-1" />
+                                Adjuntar más archivos
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <Paperclip className="h-6 w-6" />
+                              <span className="text-sm">
+                                Arrastra y suelta o haz clic para adjuntar
+                                archivos
+                              </span>
+                            </div>
+                          )}
+                          <Input
+                            id="attachment-upload"
+                            type="file"
+                            multiple // Permitir múltiples archivos
+                            className="hidden"
+                            onChange={(event) => {
+                              const files = event.target.files;
+                              if (files && files.length > 0) {
+                                // Combinar los archivos nuevos con los existentes
+                                const newFilesArray = Array.from(files);
+                                const combinedFiles = [
+                                  ...selectedFiles,
+                                  ...newFilesArray,
+                                ];
+
+                                // Eliminar duplicados si es necesario (por nombre y tamaño)
+                                const uniqueCombinedFiles =
+                                  combinedFiles.filter(
+                                    (file, index, self) =>
+                                      index ===
+                                      self.findIndex(
+                                        (f) =>
+                                          f.name === file.name &&
+                                          f.size === file.size
+                                      )
+                                  );
+
+                                setSelectedFiles(uniqueCombinedFiles);
+
+                                // Crear un nuevo FileList para react-hook-form
+                                const dataTransfer = new DataTransfer();
+                                uniqueCombinedFiles.forEach((file) =>
+                                  dataTransfer.items.add(file)
+                                );
+                                onChange(dataTransfer.files);
+                              } else if (selectedFiles.length === 0) {
+                                // Si no se seleccionó nada y no había archivos, limpiar
+                                onChange(undefined);
+                                setSelectedFiles([]);
+                              }
+                              // Si se cancela la selección pero ya había archivos, no hacer nada
+                            }}
+                            {...fieldProps}
+                          />
+                        </label>
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Tamaño máximo por archivo: 5MB. Formatos permitidos: JPG,
+                      PNG, PDF, DOC, DOCX.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

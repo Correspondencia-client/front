@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
     "/gestion-usuarios",
     "/gestion-areas",
     "/gestion-entidades",
+    "/solicitudes"
   ];
   const isPrivateRoute = privateRoutePrefixes.some((prefix) =>
     pathname.startsWith(prefix)
