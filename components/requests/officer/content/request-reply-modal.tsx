@@ -35,7 +35,6 @@ import {
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
 } from "@/constants/queries";
-import { useDebouncedCallback } from "use-debounce";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +51,7 @@ export function RequestReplyModal({
 }: ReplyModalProps) {
   const queryClient = useQueryClient();
 
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
 
   const form = useForm<ReplyRequestFormValues>({
     resolver: zodResolver(replyRequestFormSchema),
@@ -66,69 +65,69 @@ export function RequestReplyModal({
   const { isValid, isSubmitting } = form.formState;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const mounted = useRef(false);
+  // const mounted = useRef(false);
 
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  // useEffect(() => {
+  //   mounted.current = true;
+  //   return () => {
+  //     mounted.current = false;
+  //   };
+  // }, []);
 
-  const handleGenerateWithAI = useDebouncedCallback(async () => {
-    const prompt = form.getValues("aiPrompt");
-    if (!prompt) {
-      if (mounted.current) {
-        form.setError("aiPrompt", {
-          message: "Por favor, ingresa un prompt para generar el documento.",
-        });
-      }
-      return;
-    }
+  // const handleGenerateWithAI = useDebouncedCallback(async () => {
+  //   const prompt = form.getValues("aiPrompt");
 
-    if (mounted.current) {
-      setIsGeneratingAI(true);
-      form.clearErrors("aiPrompt");
-    }
+  //   if (!prompt) {
+  //     if (mounted.current) {
+  //       form.setError("aiPrompt", {
+  //         message: "Por favor, ingresa un prompt para generar el documento.",
+  //       });
+  //     }
+  //     return;
+  //   }
 
-    try {
-      const response = await fetch("/api/generate-text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
+  //   if (mounted.current) {
+  //     setIsGeneratingAI(true);
+  //     form.clearErrors("aiPrompt");
+  //   }
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Error al generar con IA");
-      }
+  //   try {
+  //     const res = await fetch("/api/generate-text", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ prompt, request }), // <--- Aquí envías el objeto request
+  //     });
+  //     const data = await res.json();
+  //     let html = data.text;
 
-      if (mounted.current) {
-        form.setValue("description", data.text, { shouldValidate: true });
-        form.setValue("aiPrompt", "");
-      }
-    } catch (error: any) {
-      console.error("Error al generar con IA:", error);
-      let errorMessage =
-        "Error al generar el documento con IA. Inténtalo de nuevo.";
-      if (error.message.includes("API key")) {
-        errorMessage =
-          "Error de autenticación con la IA. Verifica tu GOOGLE_API_KEY.";
-      } else if (error.message.includes("Quota")) {
-        errorMessage =
-          "Límite de cuota de la API alcanzado. Contacta al administrador.";
-      } else if (error.message) {
-        errorMessage = `Error de IA: ${error.message}`;
-      }
-      if (mounted.current) {
-        form.setError("aiPrompt", { message: errorMessage });
-      }
-    } finally {
-      if (mounted.current) {
-        setIsGeneratingAI(false);
-      }
-    }
-  }, 500);
+  //     // Si la respuesta viene envuelta en un bloque ```html ... ```
+  //     if (typeof html === "string") {
+  //       html = html.trim();
+  //       if (html.startsWith("```html")) {
+  //         html = html.replace(/^```html/, "").replace(/```$/, "").trim();
+  //       }
+  //     }
+
+  //     if (res.ok) {
+  //       if (mounted.current) {
+  //         form.setValue("description", html, { shouldValidate: true });
+  //         form.setValue("aiPrompt", "");
+  //       }
+  //     } else {
+  //       if (mounted.current) {
+  //         form.setError("aiPrompt", { message: data.error || "Error de IA" });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     if (mounted.current) {
+  //       form.setError("aiPrompt", { message: "Error de red o del servidor" });
+  //     }
+  //   } finally {
+  //     if (mounted.current) {
+  //       setIsGeneratingAI(false);
+  //     }
+  //   }
+  // }, 500);
 
   const handleRemoveFile = useCallback(
     (fileToRemove: File) => {
@@ -209,7 +208,12 @@ export function RequestReplyModal({
               )}
             />
 
-            <div className={cn("hidden rounded-lg border-dotted border-2 border-purple-300 bg-purple-50 p-5 shadow-lg", user?.role !== "CITIZEN" && "block")}>
+            <div
+              className={cn(
+                "hidden rounded-lg border-dotted border-2 border-purple-300 bg-purple-50 p-5 shadow-lg",
+                user?.role !== "CITIZEN" && "block"
+              )}
+            >
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-purple-700">
                 <Wand2 className="h-5 w-5 text-purple-600" />
                 Generar con IA
@@ -236,7 +240,7 @@ export function RequestReplyModal({
               />
               <Button
                 type="button"
-                onClick={handleGenerateWithAI}
+                onClick={() => {}}
                 className="mt-4 w-full bg-purple-400 hover:bg-purple-500"
                 disabled={isGeneratingAI}
               >

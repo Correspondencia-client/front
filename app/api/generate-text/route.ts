@@ -1,30 +1,44 @@
-import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
-import { NextResponse } from "next/server";
+import { generateText } from "ai";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const { prompt, request } = await req.json();
+  if (!prompt)
+    return NextResponse.json({ error: "Prompt requerido" }, { status: 400 });
+
+  // Extraer información relevante del objeto request para enriquecer el prompt
+  let requestInfo = "";
+  if (request) {
+    requestInfo = `
+Información completa de la solicitud en formato JSON:
+${JSON.stringify(request, null, 2)}
+`;
+  }
+
   try {
-    const { prompt } = await req.json();
-
-    if (!prompt) {
-      return NextResponse.json(
-        { error: "Prompt is required" },
-        { status: 400 }
-      );
-    }
-
     const { text } = await generateText({
-      model: google("gemini-2.0-flash"),
-      prompt: `Genera un documento especializado o una respuesta detallada para una solicitud administrativa, basándote en el siguiente prompt: "${prompt}". Asegúrate de que el contenido sea formal, claro y conciso, adecuado para una comunicación oficial.`,
-      system:
-        "Eres un asistente experto en redacción de documentos administrativos y respuestas a solicitudes. Tu objetivo es generar contenido profesional y preciso.",
-    });
+      model: google("gemini-2.0-flash", {
+        // @ts-expect-error: apiKey sí es aceptado por el SDK aunque el tipo no lo declare
+        apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      }),
+      prompt: `${prompt}
 
+Utiliza la siguiente información de la solicitud (en formato JSON) para redactar el documento solicitado. 
+No incluyas IDs ni campos técnicos, solo información relevante y presentable. 
+El resultado debe estar en HTML profesional, bien estructurado, con títulos, párrafos y tablas si es necesario. 
+No incluyas explicaciones, solo el HTML.
+
+Información de la solicitud:
+${JSON.stringify(request, null, 2)}
+`,
+      system:
+        "Eres un asistente experto en redacción de documentos administrativos y respuestas a solicitudes. Tu objetivo es generar contenido profesional, claro y bien presentado.",
+    });
     return NextResponse.json({ text });
   } catch (error: any) {
-    console.error("Error al generar con IA:", error);
     return NextResponse.json(
-      { error: error.message || "Error al generar el documento con IA" },
+      { error: error.message || "Error al generar texto" },
       { status: 500 }
     );
   }
