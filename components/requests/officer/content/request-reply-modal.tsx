@@ -38,8 +38,6 @@ import {
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
 } from "@/constants/queries";
-import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
 
 interface ReplyModalProps {
   isOpen: boolean;
@@ -79,9 +77,9 @@ export function RequestReplyModal({
 
   const handleGenerateWithAI = async () => {
     const prompt = form.getValues("aiPrompt");
+
     if (!prompt) {
       if (mounted.current) {
-        // Verificar si el componente está montado
         form.setError("aiPrompt", {
           message: "Por favor, ingresa un prompt para generar el documento.",
         });
@@ -90,45 +88,43 @@ export function RequestReplyModal({
     }
 
     if (mounted.current) {
-      // Verificar si el componente está montado
       setIsGeneratingAI(true);
-      form.clearErrors("aiPrompt"); // Limpiar errores previos del prompt
+      form.clearErrors("aiPrompt");
     }
 
     try {
-      const { text } = await generateText({
-        model: google("gemini-1.5-pro", {
-          apiKey: process.env.GEMINI_API_KEY, // Pasar la API key manualmente
-        }),
-        prompt: `Genera un documento especializado o una respuesta detallada para una solicitud administrativa, basándote en el siguiente prompt: "${prompt}". Asegúrate de que el contenido sea formal, claro y conciso, adecuado para una comunicación oficial.`,
-        system:
-          "Eres un asistente experto en redacción de documentos administrativos y respuestas a solicitudes. Tu objetivo es generar contenido profesional y preciso.",
+      const res = await fetch("/api/generate-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, request }), // <--- Aquí envías el objeto request
       });
+      const data = await res.json();
+      let html = data.text;
 
-      console.log("Texto generado por IA:", text); // Para depuración
+      // Si la respuesta viene envuelta en un bloque ```html ... ```
+      if (typeof html === "string") {
+        html = html.trim();
+        if (html.startsWith("```html")) {
+          html = html.replace(/^```html/, "").replace(/```$/, "").trim();
+        }
+      }
 
-      if (mounted.current) {
-        // Verificar si el componente está montado antes de actualizar
-        form.setValue("description", text, { shouldValidate: true });
-        form.setValue("aiPrompt", ""); // Limpiar el prompt después de generar
+      if (res.ok) {
+        if (mounted.current) {
+          form.setValue("description", html, { shouldValidate: true });
+          form.setValue("aiPrompt", "");
+        }
+      } else {
+        if (mounted.current) {
+          form.setError("aiPrompt", { message: data.error || "Error de IA" });
+        }
       }
-    } catch (error: any) {
-      console.error("Error al generar con IA:", error);
-      let errorMessage =
-        "Error al generar el documento con IA. Inténtalo de nuevo.";
-      if (error.message && error.message.includes("API key")) {
-        errorMessage =
-          "Error de autenticación con la IA. Asegúrate de que tu GOOGLE_API_KEY esté configurada correctamente en Vercel.";
-      } else if (error.message) {
-        errorMessage = `Error de IA: ${error.message}`;
-      }
+    } catch (error) {
       if (mounted.current) {
-        // Verificar si el componente está montado antes de actualizar
-        form.setError("aiPrompt", { message: errorMessage });
+        form.setError("aiPrompt", { message: "Error de red o del servidor" });
       }
     } finally {
       if (mounted.current) {
-        // Verificar si el componente está montado antes de actualizar
         setIsGeneratingAI(false);
       }
     }
