@@ -144,7 +144,7 @@ export function MyRequestsContent() {
         <RequestReplyModal
           isOpen={isReplyModalOpen}
           onClose={() => setIsReplyModalOpen(false)}
-          request={selectedRequest}
+          requestId={selectedRequest.id}
         />
       )}
 
@@ -183,7 +183,6 @@ export function MyRequestsContent() {
         </div>
 
         {/* Tabla de solicitudes por estado seleccionado */}
-
         <Card>
           {!status ? (
             <AssignedRequestCardHeaderSkeleton />

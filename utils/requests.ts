@@ -21,6 +21,15 @@ export async function getMyAssignedRequestsCountByStatus(): Promise<RequestsCoun
   return response.data;
 }
 
+export async function getMyRequestsCount(): Promise<RequestsCountByStatus> {
+  const response = await api.get<RequestsCountByStatus>(
+    "/requests/my-requests/count-by-status"
+  );
+
+  console.log(response.data);
+  return response.data;
+}
+
 export async function getMyAssignedRequests(
   params: AssignedRequestParams
 ): Promise<AssignedRequestsResponse> {
@@ -36,7 +45,40 @@ export async function getMyAssignedRequests(
 
     const requests = data ?? [];
 
-    console.log(requests)
+    console.log(requests);
+
+    return {
+      requests,
+      total,
+      page,
+      limit,
+    };
+  } catch (error) {
+    return {
+      requests: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+    };
+  }
+}
+
+export async function getMyRequests(
+  params: AssignedRequestParams
+): Promise<AssignedRequestsResponse> {
+  try {
+    const response = await api.get<ApiAssignedRequestsResponse>(
+      "/requests/my-requests",
+      {
+        params,
+      }
+    );
+
+    const { data, page, total, limit } = response.data;
+
+    const requests = data ?? [];
+
+    console.log(requests);
 
     return {
       requests,
@@ -104,7 +146,9 @@ export const createCitizenRequest = async (data: CitizenRequestFormValues) => {
   return response.data;
 };
 
-export const getRequestHistory = async (requestId: string): Promise<RequestHistoryItem[]> => {
+export const getRequestHistory = async (
+  requestId: string
+): Promise<RequestHistoryItem[]> => {
   const response = await api.get(`/requests/${requestId}/history`);
   console.log("HISTORY RESPONSE", response.data);
   return response.data;

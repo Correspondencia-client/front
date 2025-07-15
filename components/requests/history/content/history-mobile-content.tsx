@@ -1,9 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRequestHistory } from "@/hooks/use-requests";
-import { History } from "lucide-react";
-import { RequestHistoryItem } from "./request-history-item";
-import { RequestHistoryItemSkeleton } from "../skeletons/request-history-item-skeleton";
 import { useState } from "react";
+import { History, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRequestHistory } from "@/hooks/use-requests";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RequestHistoryItem } from "./request-history-item";
+import { RequestHistoryItemSkeleton } from "@/components/requests/history/skeletons/request-history-item-skeleton";
+import { RequestReplyModal } from "@/components/requests/officer/content/request-reply-modal";
 
 interface HistoryContentProps {
   requestId: string;
@@ -12,6 +14,8 @@ interface HistoryContentProps {
 export default function HistoryMobileContent({
   requestId,
 }: HistoryContentProps) {
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+
   const { data: history = [], isLoading: isLoadingHisotry } =
     useRequestHistory(requestId);
 
@@ -24,52 +28,69 @@ export default function HistoryMobileContent({
   };
 
   return (
-    <div className="block md:hidden space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <History className="h-6 w-6" />
-          Historial de la solicitud
-        </h2>
-        <p className="text-muted-foreground">
-          Aquí puedes ver todas las acciones y eventos relacionados con esta
-          solicitud.
-        </p>
+    <>
+      {isReplyModalOpen && (
+        <RequestReplyModal
+          isOpen={isReplyModalOpen}
+          onClose={() => setIsReplyModalOpen(false)}
+          requestId={requestId}
+        />
+      )}
+      <div className="block md:hidden space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <History className="h-6 w-6" />
+            Historial de la solicitud
+          </h2>
+          <p className="text-muted-foreground">
+            Aquí puedes ver todas las acciones y eventos relacionados con esta
+            solicitud.
+          </p>
+
+          <Button
+            onClick={() => setIsReplyModalOpen(true)}
+            className="w-full mt-4"
+          >
+            <Plus />
+            Crear respuesta
+          </Button>
+        </div>
+
+        {isLoadingHisotry && (
+          <div className="space-y-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <RequestHistoryItemSkeleton key={i} isMyResponse={i % 2 === 0} />
+            ))}
+          </div>
+        )}
+
+        {!isLoadingHisotry && history.length === 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Sin Historial</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                No se encontraron eventos en el historial para esta solicitud.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isLoadingHisotry && history.length > 0 && (
+          <div className="space-y-6">
+            {history.map((item) => (
+              <RequestHistoryItem
+                type="Mobile"
+                key={item.id}
+                item={item}
+                isExpanded={expandedRequestId === item.id}
+                onToggle={() => toggleRequest(item.id)}
+              />
+            ))}
+          </div>
+        )}
       </div>
-
-      {isLoadingHisotry && (
-        <div className="space-y-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <RequestHistoryItemSkeleton key={i} isMyResponse={i % 2 === 0} />
-          ))}
-        </div>
-      )}
-
-      {!isLoadingHisotry && history.length === 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Sin Historial</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              No se encontraron eventos en el historial para esta solicitud.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoadingHisotry && history.length > 0 && (
-        <div className="space-y-6">
-          {history.map((item) => (
-            <RequestHistoryItem
-              type="Mobile"
-              key={item.id}
-              item={item}
-              isExpanded={expandedRequestId === item.id}
-              onToggle={() => toggleRequest(item.id)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }

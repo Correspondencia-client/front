@@ -11,11 +11,9 @@ import {
   Calendar,
   Download,
   FileText,
-  Info,
   Mail,
   Paperclip,
   ShieldCheck,
-  Tag,
   User,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,12 +25,6 @@ interface RequestHistoryItemProps {
   onToggle: () => void;
 }
 
-interface Document {
-  id: string;
-  url: string;
-  name: string;
-}
-
 export function RequestHistoryItem({
   type,
   item,
@@ -42,73 +34,10 @@ export function RequestHistoryItem({
   const { user } = useAuthStore();
   const isMyResponse = item?.updatedBy?.email === user?.email;
 
-  const handleDownload = async (doc: Document): Promise<void> => {
-    const isSameOrigin = (url: string): boolean => {
-      try {
-        return new URL(url).origin === window.location.origin;
-      } catch {
-        return false;
-      }
-    };
-
-    const downloadFile = (url: string, fileName: string, blob?: Blob): void => {
-      const downloadUrl = blob ? window.URL.createObjectURL(blob) : url;
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = fileName; // Forzar el nombre del archivo
-      a.style.display = "none";
-      // Evitar abrir en nueva pestaña, eliminar target="_blank" y rel="noopener noreferrer"
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      if (blob) {
-        window.URL.revokeObjectURL(downloadUrl); // Liberar memoria
-      }
-    };
-
-    try {
-      if (isSameOrigin(doc.url)) {
-        // Para archivos del mismo origen, usar fetch para controlar el proceso
-        const response = await fetch(doc.url, {
-          method: "GET",
-          headers: {
-            // Asegúrate de incluir credenciales si es necesario (por ejemplo, cookies de autenticación)
-            credentials: "same-origin",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        downloadFile(doc.url, doc.name, blob);
-      } else {
-        // Para URLs externas, intentar fetch con CORS si está permitido
-        const response = await fetch(doc.url, {
-          method: "GET",
-          mode: "cors", // Intentar CORS para URLs externas
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        downloadFile(doc.url, doc.name, blob);
-      }
-    } catch (error) {
-      console.error("Error al intentar descargar:", error);
-      // Fallback: Intentar descarga directa si fetch falla (por ejemplo, por CORS)
-      downloadFile(doc.url, doc.name);
-    }
-  };
-
   return (
     <Card
       className={cn(
         "relative overflow-hidden max-sm:py-10 border gap-4",
-        isMyResponse && "border-2 border-blue-500 shadow-md",
         item.message === "Solicitud asignada automáticamente." && "hidden"
       )}
       onClick={onToggle}
@@ -129,23 +58,22 @@ export function RequestHistoryItem({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {!isMyResponse &&
-          (user?.role === "ADMIN" || user?.role === "OFFICER") && (
-            <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>{new Date(item.createdAt).toLocaleString()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span>{item.createdBy?.fullName}</span>
-              </div>
-              <div className="flex items-center gap-2 col-span-full">
-                <Mail className="h-4 w-4" />
-                <span>{item.createdBy?.email}</span>
-              </div>
+        {!isMyResponse && (
+          <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>{new Date(item.createdAt).toLocaleString()}</span>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>{item.createdBy?.fullName}</span>
+            </div>
+            <div className="flex items-center gap-2 col-span-full">
+              <Mail className="h-4 w-4" />
+              <span>{item.createdBy?.email}</span>
+            </div>
+          </div>
+        )}
         {isMyResponse &&
           (user?.role === "ADMIN" || user?.role === "OFFICER") && (
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">

@@ -17,7 +17,7 @@ export function HistoryItem({ history }: HistoryItemProps) {
   const { selectedHistoryItem, setHistoryItem } = useHistoryStore();
 
   const isSelected = selectedHistoryItem?.id === history.id;
-  const isMyResponse = history?.updatedBy?.email === user?.email;
+  const isMyResponse = history?.updatedBy?.email === user?.email || history?.createdBy?.email === user?.email;
 
   const cardClass = cn(
     "w-full h-auto justify-start p-3 text-left flex flex-col items-start gap-1 border transition-all duration-150",
@@ -47,7 +47,7 @@ export function HistoryItem({ history }: HistoryItemProps) {
             variant="secondary"
             className="bg-blue-200 text-blue-800 text-xs"
           >
-            Tu Respuesta
+            Tu respuesta
           </Badge>
         )}
       </div>

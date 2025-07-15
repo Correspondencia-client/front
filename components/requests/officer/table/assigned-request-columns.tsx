@@ -83,6 +83,7 @@ export function getAssignedRequestColumns(
                 variant="default"
                 size="sm"
                 className={cn(
+                  "bg-emerald-100 text-emerald-700 hover:bg-emerald-200",
                   (row.original.status === "IN_REVIEW" ||
                     row.original.status === "COMPLETED") &&
                     "hidden"
@@ -95,8 +96,7 @@ export function getAssignedRequestColumns(
               <Link
                 href={`/solicitudes/historial/${row.original.id}`}
                 className={cn(
-                  "hidden bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all h-8 gap-1.5 px-3 has-[>svg]:px-2.5",
-                  row.original.status === "IN_REVIEW" && "inline-flex"
+                  "inline-flex bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all h-8 gap-1.5 px-3 has-[>svg]:px-2.5"
                 )}
               >
                 <Reply className="h-4 w-4 mr-1" />

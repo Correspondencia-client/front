@@ -40,6 +40,16 @@ export const routes = {
       url: "/panel",
       icon: LayoutDashboardIcon,
     },
+    {
+      title: "Nueva solicitud",
+      url: "/solicitudes/ciudadano/nueva-solicitud",
+      icon: PlusCircle,
+    },
+    {
+      title: "Mis solicitudes",
+      url: "/solicitudes/ciudadano/mis-solicitudes",
+      icon: FileText,
+    },
   ],
   navMainAdminAndSuperAdmin: [
     {

@@ -9,29 +9,40 @@ import {
 import { Plus } from "lucide-react";
 import { HistoryList } from "./history-list";
 import { useRequestHistory } from "@/hooks/use-requests";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RequestReplyModal } from "../../officer/content/request-reply-modal";
+import { useHistoryStore } from "@/stores/history-store";
 
 interface HistorySidebarProps {
   requestId: string;
 }
 
 export function HistorySidebar({ requestId }: HistorySidebarProps) {
-  // Estado para el modal de respuesta
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const { setHistoryItem } = useHistoryStore();
 
   const { data: history = [], isLoading: isLoadingHisotry } =
     useRequestHistory(requestId);
 
+  useEffect(() => {
+    if (history.length > 0) {
+      if (history.length === 2) {
+        setHistoryItem(history[1]);
+      } else if (history.length > 2) {
+        setHistoryItem(history[0]);
+      }
+    }
+  }, [history, setHistoryItem]);
+
   return (
     <>
-      {/* {isReplyModalOpen && (
+      {isReplyModalOpen && (
         <RequestReplyModal
           isOpen={isReplyModalOpen}
           onClose={() => setIsReplyModalOpen(false)}
-          // request={{}}
+          requestId={requestId}
         />
-      )} */}
+      )}
       <Card className="hidden md:flex w-80 h-full shrink-0 rounded-none border-r">
         <CardHeader className="gap-3">
           <div className="space-y-2 mb-3">

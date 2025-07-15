@@ -9,8 +9,8 @@ export function HistoryDesktopContent() {
   return (
     <div className="hidden md:block">
       <div className="pb-4">
-        <h3 className="text-2xl font-bold">Detalles del Evento</h3>
-        <p>Información completa del evento seleccionado en el historial.</p>
+        <h3 className="text-2xl font-bold">Detalles de la respuesta</h3>
+        <p>Información completa de la respuesta seleccionada en el historial.</p>
       </div>
       {selectedHistoryItem ? (
         <RequestHistoryItem

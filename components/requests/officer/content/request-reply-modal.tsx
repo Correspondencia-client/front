@@ -1,446 +1,7 @@
-// "use client";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Badge } from "@/components/ui/badge";
-
-// import { useForm } from "react-hook-form";
-// import * as z from "zod";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-// } from "@/components/ui/dialog";
-// import { Button } from "@/components/ui/button";
-// import {
-//   Form,
-//   FormControl,
-//   FormDescription,
-//   FormField,
-//   FormItem,
-//   FormLabel,
-//   FormMessage,
-// } from "@/components/ui/form";
-// import { Input } from "@/components/ui/input";
-// import { Send, Paperclip, X, Loader, Wand2 } from "lucide-react";
-// import { useState, useCallback, useRef, useEffect } from "react"; // Importar useCallback
-// import { RichTextEditor } from "@/components/common/rich-text-editor";
-// import { AssignedRequestItem } from "@/types/requests";
-// import {
-//   replyRequestFormSchema,
-//   ReplyRequestFormValues,
-// } from "@/schemas/request";
-// import { replyToRequest } from "@/utils/requests";
-// import { toast } from "sonner";
-// import { useQueryClient } from "@tanstack/react-query";
-// import {
-//   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
-//   MY_ASSIGNED_REQUESTS_QUERY_KEY,
-// } from "@/constants/queries";
-// import { generateText } from "ai";
-// import { google } from "@ai-sdk/google";
-
-// interface ReplyModalProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-//   request: AssignedRequestItem; // Para saber a qué solicitud se está respondiendo
-// }
-
-// export function RequestReplyModal({
-//   isOpen,
-//   onClose,
-//   request,
-// }: ReplyModalProps) {
-//   const queryClient = useQueryClient();
-
-//   const form = useForm<ReplyRequestFormValues>({
-//     resolver: zodResolver(replyRequestFormSchema),
-//     defaultValues: {
-//       title: "",
-//       description: "",
-//       aiPrompt: "",
-//     },
-//   });
-
-//   const { isValid, isSubmitting } = form.formState;
-
-//   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-//   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-
-//   const mounted = useRef(false); // Ref para rastrear si el componente está montado
-
-//   useEffect(() => {
-//     mounted.current = true;
-//     return () => {
-//       mounted.current = false;
-//     };
-//   }, []);
-
-//   const handleGenerateWithAI = async () => {
-//     const prompt = form.getValues("aiPrompt");
-//     if (!prompt) {
-//       if (mounted.current) {
-//         // Verificar si el componente está montado
-//         form.setError("aiPrompt", {
-//           message: "Por favor, ingresa un prompt para generar el documento.",
-//         });
-//       }
-//       return;
-//     }
-
-//     if (mounted.current) {
-//       // Verificar si el componente está montado
-//       setIsGeneratingAI(true);
-//       form.clearErrors("aiPrompt"); // Limpiar errores previos del prompt
-//     }
-
-//     try {
-//       const { text } = await generateText({
-//         model: google("gemini-1.5-pro"), // Usamos el modelo Gemini 1.5 Pro de Google
-//         prompt: `Genera un documento especializado o una respuesta detallada para una solicitud administrativa, basándote en el siguiente prompt: "${prompt}". Asegúrate de que el contenido sea formal, claro y conciso, adecuado para una comunicación oficial.`,
-//         system:
-//           "Eres un asistente experto en redacción de documentos administrativos y respuestas a solicitudes. Tu objetivo es generar contenido profesional y preciso.",
-//       });
-
-//       console.log("Texto generado por IA:", text); // Para depuración
-
-//       if (mounted.current) {
-//         // Verificar si el componente está montado antes de actualizar
-//         form.setValue("description", text, { shouldValidate: true });
-//         form.setValue("aiPrompt", ""); // Limpiar el prompt después de generar
-//       }
-//     } catch (error: any) {
-//       console.error("Error al generar con IA:", error);
-//       let errorMessage =
-//         "Error al generar el documento con IA. Inténtalo de nuevo.";
-//       if (error.message && error.message.includes("API key")) {
-//         errorMessage =
-//           "Error de autenticación con la IA. Asegúrate de que tu GOOGLE_API_KEY esté configurada correctamente en Vercel.";
-//       } else if (error.message) {
-//         errorMessage = `Error de IA: ${error.message}`;
-//       }
-//       if (mounted.current) {
-//         // Verificar si el componente está montado antes de actualizar
-//         form.setError("aiPrompt", { message: errorMessage });
-//       }
-//     } finally {
-//       if (mounted.current) {
-//         // Verificar si el componente está montado antes de actualizar
-//         setIsGeneratingAI(false);
-//       }
-//     }
-//   };
-
-//   // Función para manejar la eliminación de un archivo individual
-//   const handleRemoveFile = useCallback(
-//     (fileToRemove: File) => {
-//       const updatedFiles = selectedFiles.filter(
-//         (file) => file !== fileToRemove
-//       );
-//       setSelectedFiles(updatedFiles);
-
-//       // Crear un nuevo FileList para actualizar el campo del formulario
-//       const dataTransfer = new DataTransfer();
-//       updatedFiles.forEach((file) => dataTransfer.items.add(file));
-//       form.setValue("attachment", dataTransfer.files);
-
-//       // Si no quedan archivos, resetear el input de archivo para permitir re-selección
-//       if (updatedFiles.length === 0) {
-//         const inputElement = document.getElementById(
-//           "attachment-upload"
-//         ) as HTMLInputElement;
-//         if (inputElement) {
-//           inputElement.value = "";
-//         }
-//       }
-//     },
-//     [selectedFiles, form]
-//   );
-
-//   const onSubmit = async (values: ReplyRequestFormValues) => {
-//     try {
-//       await replyToRequest(request.id, values);
-//       queryClient.invalidateQueries({
-//         queryKey: [MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY],
-//         exact: false,
-//       });
-//       queryClient.invalidateQueries({
-//         queryKey: [MY_ASSIGNED_REQUESTS_QUERY_KEY],
-//         exact: false,
-//       });
-//       toast.success("Respuesta enviada con éxito!");
-//       form.reset();
-//       setSelectedFiles([]);
-//       onClose();
-//     } catch (error) {
-//       console.error("Error al enviar respuesta:", error);
-//       toast.error("Hubo un error al enviar la respuesta.");
-//     }
-//   };
-
-//   return (
-//     <Dialog open={isOpen} onOpenChange={onClose}>
-//       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
-//         <DialogHeader>
-//           <DialogTitle className="text-2xl font-bold">
-//             Responder a la solicitud:{" "}
-//             <span className="text-primary">{request.procedure.name}</span>
-//           </DialogTitle>
-//           <DialogDescription>
-//             Redacta tu respuesta para la solicitud seleccionada.
-//           </DialogDescription>
-//         </DialogHeader>
-
-//         <Form {...form}>
-//           <form
-//             onSubmit={form.handleSubmit(onSubmit)}
-//             className="space-y-6 flex-1 overflow-auto pr-4 -mr-4"
-//           >
-//             {/* Campo de Título */}
-//             <FormField
-//               control={form.control}
-//               name="title"
-//               render={({ field }) => (
-//                 <FormItem>
-//                   <FormLabel>Título de la Respuesta</FormLabel>
-//                   <FormControl>
-//                     <Input placeholder="Asunto de tu respuesta" {...field} />
-//                   </FormControl>
-//                   <FormDescription>
-//                     Un título claro para tu mensaje. Máximo 200 caracteres.
-//                   </FormDescription>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
-
-//             {/* Sección de Generación con IA */}
-//             <div className="rounded-lg border bg-card p-4 shadow-sm">
-//               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-//                 <Wand2 className="h-5 w-5 text-purple-600" />
-//                 Generar con IA
-//               </h3>
-//               <FormField
-//                 control={form.control}
-//                 name="aiPrompt"
-//                 render={({ field }) => (
-//                   <FormItem>
-//                     <FormLabel>Prompt para IA</FormLabel>
-//                     <FormControl>
-//                       <Input
-//                         placeholder="Ej: Genera una respuesta formal sobre el estado de la solicitud de presupuesto."
-//                         {...field}
-//                       />
-//                     </FormControl>
-//                     <FormDescription>
-//                       Describe el tipo de documento o respuesta que deseas que
-//                       la IA genere.
-//                     </FormDescription>
-//                     <FormMessage />
-//                   </FormItem>
-//                 )}
-//               />
-//               <Button
-//                 type="button"
-//                 onClick={handleGenerateWithAI}
-//                 className="mt-4 w-full"
-//                 disabled={isGeneratingAI}
-//               >
-//                 {isGeneratingAI ? (
-//                   <>Generando...</>
-//                 ) : (
-//                   <>
-//                     <Wand2 className="mr-2 h-4 w-4" />
-//                     Generar con IA
-//                   </>
-//                 )}
-//               </Button>
-//             </div>
-
-//             {/* Campo de Descripción (Rich Text Editor) */}
-//             <FormField
-//               control={form.control}
-//               name="description"
-//               render={({ field }) => (
-//                 <FormItem>
-//                   <FormLabel>Contenido de la Respuesta</FormLabel>
-//                   <FormControl>
-//                     <RichTextEditor
-//                       content={field.value}
-//                       onChange={field.onChange}
-//                       placeholder="Escribe tu respuesta detallada aquí..."
-//                     />
-//                   </FormControl>
-//                   <FormDescription>
-//                     Utiliza el editor para dar formato a tu mensaje. Mínimo 10
-//                     caracteres, máximo 5000.
-//                   </FormDescription>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
-
-//             {/* Campo para subir archivo - Modernizado y con eliminación individual */}
-//             <FormField
-//               control={form.control}
-//               name="attachment"
-//               render={({ field: { value, onChange, ...fieldProps } }) => (
-//                 <FormItem>
-//                   <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
-//                   <FormControl>
-//                     <div className="flex flex-col gap-2">
-//                       <label
-//                         htmlFor="attachment-upload"
-//                         className="flex min-h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 text-gray-600 transition-colors hover:border-gray-400 hover:bg-gray-100"
-//                       >
-//                         {selectedFiles.length > 0 ? (
-//                           <div className="flex flex-col items-center gap-1 p-2">
-//                             <p className="text-sm font-medium mb-1">
-//                               Archivos seleccionados:
-//                             </p>
-//                             <div className="flex flex-wrap justify-center gap-2">
-//                               {selectedFiles.map((file, index) => (
-//                                 <Badge
-//                                   key={file.name + file.size + index} // Usar una clave más robusta
-//                                   variant="secondary"
-//                                   className="flex items-center gap-1 pr-1 text-sm"
-//                                 >
-//                                   <Paperclip className="h-3 w-3" />
-//                                   {file.name}
-//                                   <Button
-//                                     type="button"
-//                                     variant="ghost"
-//                                     size="icon"
-//                                     className="h-5 w-5 text-gray-500 hover:text-gray-700"
-//                                     onClick={(e) => {
-//                                       e.preventDefault();
-//                                       e.stopPropagation(); // Evitar que se dispare el evento del label
-//                                       handleRemoveFile(file);
-//                                     }}
-//                                   >
-//                                     <X className="h-3 w-3" />
-//                                     <span className="sr-only">
-//                                       Eliminar {file.name}
-//                                     </span>
-//                                   </Button>
-//                                 </Badge>
-//                               ))}
-//                             </div>
-//                             <Button
-//                               type="button"
-//                               variant="link"
-//                               size="sm"
-//                               className="mt-2 text-blue-600 hover:text-blue-800"
-//                               onClick={(e) => {
-//                                 e.preventDefault();
-//                                 onChange(undefined); // Limpiar el valor del campo
-//                                 setSelectedFiles([]); // Limpiar el array de archivos
-//                                 const inputElement = document.getElementById(
-//                                   "attachment-upload"
-//                                 ) as HTMLInputElement;
-//                                 if (inputElement) {
-//                                   inputElement.value = ""; // Resetear el input de archivo
-//                                 }
-//                               }}
-//                             >
-//                               <Paperclip className="h-4 w-4 mr-1" />
-//                               Adjuntar más archivos
-//                             </Button>
-//                           </div>
-//                         ) : (
-//                           <div className="flex flex-col items-center gap-2">
-//                             <Paperclip className="h-6 w-6" />
-//                             <span className="text-sm">
-//                               Arrastra y suelta o haz clic para adjuntar
-//                               archivos
-//                             </span>
-//                           </div>
-//                         )}
-//                         <Input
-//                           id="attachment-upload"
-//                           type="file"
-//                           multiple // Permitir múltiples archivos
-//                           className="hidden"
-//                           onChange={(event) => {
-//                             const files = event.target.files;
-//                             if (files && files.length > 0) {
-//                               // Combinar los archivos nuevos con los existentes
-//                               const newFilesArray = Array.from(files);
-//                               const combinedFiles = [
-//                                 ...selectedFiles,
-//                                 ...newFilesArray,
-//                               ];
-
-//                               // Eliminar duplicados si es necesario (por nombre y tamaño)
-//                               const uniqueCombinedFiles = combinedFiles.filter(
-//                                 (file, index, self) =>
-//                                   index ===
-//                                   self.findIndex(
-//                                     (f) =>
-//                                       f.name === file.name &&
-//                                       f.size === file.size
-//                                   )
-//                               );
-
-//                               setSelectedFiles(uniqueCombinedFiles);
-
-//                               // Crear un nuevo FileList para react-hook-form
-//                               const dataTransfer = new DataTransfer();
-//                               uniqueCombinedFiles.forEach((file) =>
-//                                 dataTransfer.items.add(file)
-//                               );
-//                               onChange(dataTransfer.files);
-//                             } else if (selectedFiles.length === 0) {
-//                               // Si no se seleccionó nada y no había archivos, limpiar
-//                               onChange(undefined);
-//                               setSelectedFiles([]);
-//                             }
-//                             // Si se cancela la selección pero ya había archivos, no hacer nada
-//                           }}
-//                           {...fieldProps}
-//                         />
-//                       </label>
-//                     </div>
-//                   </FormControl>
-//                   <FormDescription>
-//                     Tamaño máximo por archivo: 5MB. Formatos permitidos: JPG,
-//                     PNG, PDF, DOC, DOCX.
-//                   </FormDescription>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
-
-//             <DialogFooter className="pt-4">
-//               <Button type="button" variant="outline" onClick={onClose}>
-//                 Cancelar
-//               </Button>
-//               <Button type="submit" disabled={!isValid || isSubmitting}>
-//                 {isSubmitting ? (
-//                   <>
-//                     <Loader className="animate-spin" />
-//                     Enviando...
-//                   </>
-//                 ) : (
-//                   <>
-//                     <Send className="mr-2 h-4 w-4" />
-//                     Enviar Respuesta
-//                   </>
-//                 )}
-//               </Button>
-//             </DialogFooter>
-//           </form>
-//         </Form>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// }
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import {
   Dialog,
   DialogContent,
@@ -463,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Send, Paperclip, X, Loader, Wand2 } from "lucide-react";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { RichTextEditor } from "@/components/common/rich-text-editor";
-import { AssignedRequestItem } from "@/types/requests";
 import {
   replyRequestFormSchema,
   ReplyRequestFormValues,
@@ -476,19 +36,24 @@ import {
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
 } from "@/constants/queries";
 import { useDebouncedCallback } from "use-debounce";
+import { useAuthStore } from "@/stores/auth-store";
+import { cn } from "@/lib/utils";
 
 interface ReplyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  request: AssignedRequestItem;
+  requestId: string;
 }
 
 export function RequestReplyModal({
   isOpen,
   onClose,
-  request,
+  requestId,
 }: ReplyModalProps) {
   const queryClient = useQueryClient();
+
+  const { user } = useAuthStore()
+
   const form = useForm<ReplyRequestFormValues>({
     resolver: zodResolver(replyRequestFormSchema),
     defaultValues: {
@@ -544,11 +109,14 @@ export function RequestReplyModal({
       }
     } catch (error: any) {
       console.error("Error al generar con IA:", error);
-      let errorMessage = "Error al generar el documento con IA. Inténtalo de nuevo.";
+      let errorMessage =
+        "Error al generar el documento con IA. Inténtalo de nuevo.";
       if (error.message.includes("API key")) {
-        errorMessage = "Error de autenticación con la IA. Verifica tu GOOGLE_API_KEY.";
+        errorMessage =
+          "Error de autenticación con la IA. Verifica tu GOOGLE_API_KEY.";
       } else if (error.message.includes("Quota")) {
-        errorMessage = "Límite de cuota de la API alcanzado. Contacta al administrador.";
+        errorMessage =
+          "Límite de cuota de la API alcanzado. Contacta al administrador.";
       } else if (error.message) {
         errorMessage = `Error de IA: ${error.message}`;
       }
@@ -587,7 +155,7 @@ export function RequestReplyModal({
 
   const onSubmit = async (values: ReplyRequestFormValues) => {
     try {
-      await replyToRequest(request.id, values);
+      await replyToRequest(requestId, values);
       queryClient.invalidateQueries({
         queryKey: [MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY],
         exact: false,
@@ -611,8 +179,8 @@ export function RequestReplyModal({
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Responder a la solicitud:{" "}
-            <span className="text-primary">{request.procedure.name}</span>
+            Responder a la solicitud{" "}
+            {/* <span className="text-primary">{request.procedure.name}</span> */}
           </DialogTitle>
           <DialogDescription>
             Redacta tu respuesta para la solicitud seleccionada.
@@ -622,7 +190,7 @@ export function RequestReplyModal({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 flex-1 overflow-auto pr-4 -mr-4"
+            className="space-y-6 flex-1 overflow-auto p-2 -mr-4"
           >
             <FormField
               control={form.control}
@@ -641,8 +209,8 @@ export function RequestReplyModal({
               )}
             />
 
-            <div className="rounded-lg border bg-card p-4 shadow-sm">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <div className={cn("hidden rounded-lg border-dotted border-2 border-purple-300 bg-purple-50 p-5 shadow-lg", user?.role !== "CITIZEN" && "block")}>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-purple-700">
                 <Wand2 className="h-5 w-5 text-purple-600" />
                 Generar con IA
               </h3>
@@ -669,7 +237,7 @@ export function RequestReplyModal({
               <Button
                 type="button"
                 onClick={handleGenerateWithAI}
-                className="mt-4 w-full"
+                className="mt-4 w-full bg-purple-400 hover:bg-purple-500"
                 disabled={isGeneratingAI}
               >
                 {isGeneratingAI ? (
