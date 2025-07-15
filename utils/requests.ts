@@ -5,6 +5,7 @@ import {
 } from "@/schemas/request";
 import {
   ApiAssignedRequestsResponse,
+  AssignAreaPayload,
   AssignedRequestItem,
   AssignedRequestParams,
   AssignedRequestsResponse,
@@ -153,3 +154,14 @@ export const getRequestHistory = async (
   console.log("HISTORY RESPONSE", response.data);
   return response.data;
 };
+
+export async function assignRequestToArea(
+  requestId: string,
+  payload: AssignAreaPayload
+) {
+  const response = await api.patch(
+    `/requests/${requestId}/assign-area`,
+    payload
+  );
+  return response.data;
+}

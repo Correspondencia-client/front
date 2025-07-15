@@ -18,6 +18,7 @@ import { AssignedRequestCardHeaderSkeleton } from "../../officer/skeleton/assign
 import { CitizenHistoryCardItem } from "./citizen-history-card-item";
 import { CitizenHistoryCardItemSkeleton } from "../skeletons/citizen-history-card-item-skeleton";
 import { Paginator } from "@/components/common/paginator";
+import Image from "next/image";
 
 interface MyRequestFilters {
   search: string;
@@ -122,8 +123,17 @@ export function CitizenHistoryContent() {
             ))
           ) : (
             // Datos cargados pero sin resultados
-            <div className="text-muted-foreground text-center py-6">
-              Sin resultados.
+            <div className="py-6 bg-muted/50 rounded-md">
+              <Image
+                src="/images/areas-empty-state.svg"
+                alt="No hay solicitudes"
+                width={150}
+                height={150}
+                className="mx-auto mb-4 w-auto h-40 sm:h-60 "
+              />
+              <p className="text-muted-foreground font-medium text-center">
+                Sin resultados
+              </p>
             </div>
           )}
 

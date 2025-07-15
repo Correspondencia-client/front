@@ -34,9 +34,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
+  REQUEST_HISTORY_QUERY_KEY,
 } from "@/constants/queries";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
+import {
+  EXTENSION_TO_TYPE_MAP,
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB,
+} from "@/constants/files";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ReplyModalProps {
   isOpen: boolean;
@@ -163,6 +170,10 @@ export function RequestReplyModal({
         queryKey: [MY_ASSIGNED_REQUESTS_QUERY_KEY],
         exact: false,
       });
+      queryClient.invalidateQueries({
+        queryKey: [REQUEST_HISTORY_QUERY_KEY],
+        exact: false,
+      });
       toast.success("Respuesta enviada con éxito!");
       form.reset();
       setSelectedFiles([]);
@@ -225,7 +236,8 @@ export function RequestReplyModal({
                   <FormItem>
                     <FormLabel>Prompt para IA</FormLabel>
                     <FormControl>
-                      <Input
+                      <Textarea
+                      className="bg-white"
                         placeholder="Ej: Genera una respuesta formal sobre el estado de la solicitud de presupuesto."
                         {...field}
                       />
@@ -297,7 +309,7 @@ export function RequestReplyModal({
                             <div className="flex flex-wrap justify-center gap-2">
                               {selectedFiles.map((file, index) => (
                                 <Badge
-                                  key={file.name + file.size + index}
+                                  key={file.name + file.size + index} // Usar una clave más robusta
                                   variant="secondary"
                                   className="flex items-center gap-1 pr-1 text-sm"
                                 >
@@ -310,7 +322,7 @@ export function RequestReplyModal({
                                     className="h-5 w-5 text-gray-500 hover:text-gray-700"
                                     onClick={(e) => {
                                       e.preventDefault();
-                                      e.stopPropagation();
+                                      e.stopPropagation(); // Evitar que se dispare el evento del label
                                       handleRemoveFile(file);
                                     }}
                                   >
@@ -329,13 +341,13 @@ export function RequestReplyModal({
                               className="mt-2 text-blue-600 hover:text-blue-800"
                               onClick={(e) => {
                                 e.preventDefault();
-                                onChange(undefined);
-                                setSelectedFiles([]);
+                                onChange(undefined); // Limpiar el valor del campo
+                                setSelectedFiles([]); // Limpiar el array de archivos
                                 const inputElement = document.getElementById(
                                   "attachment-upload"
                                 ) as HTMLInputElement;
                                 if (inputElement) {
-                                  inputElement.value = "";
+                                  inputElement.value = ""; // Resetear el input de archivo
                                 }
                               }}
                             >
@@ -355,17 +367,104 @@ export function RequestReplyModal({
                         <Input
                           id="attachment-upload"
                           type="file"
-                          multiple
+                          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                          multiple // Permitir múltiples archivos
                           className="hidden"
+                          // onChange={(event) => {
+                          //   const files = event.target.files;
+                          //   if (files && files.length > 0) {
+                          //     // Combinar los archivos nuevos con los existentes
+                          //     const newFilesArray = Array.from(files);
+                          //     const combinedFiles = [
+                          //       ...selectedFiles,
+                          //       ...newFilesArray,
+                          //     ];
+
+                          //     // Eliminar duplicados si es necesario (por nombre y tamaño)
+                          //     const uniqueCombinedFiles =
+                          //       combinedFiles.filter(
+                          //         (file, index, self) =>
+                          //           index ===
+                          //           self.findIndex(
+                          //             (f) =>
+                          //               f.name === file.name &&
+                          //               f.size === file.size
+                          //           )
+                          //       );
+
+                          //     setSelectedFiles(uniqueCombinedFiles);
+
+                          //     // Crear un nuevo FileList para react-hook-form
+                          //     const dataTransfer = new DataTransfer();
+                          //     uniqueCombinedFiles.forEach((file) =>
+                          //       dataTransfer.items.add(file)
+                          //     );
+                          //     onChange(dataTransfer.files);
+                          //   } else if (selectedFiles.length === 0) {
+                          //     // Si no se seleccionó nada y no había archivos, limpiar
+                          //     onChange(undefined);
+                          //     setSelectedFiles([]);
+                          //   }
+                          //   // Si se cancela la selección pero ya había archivos, no hacer nada
+                          // }}
                           onChange={(event) => {
                             const files = event.target.files;
+                            const rejectedFiles: string[] = [];
+
                             if (files && files.length > 0) {
                               const newFilesArray = Array.from(files);
+                              const validFiles: File[] = [];
+
+                              for (const file of newFilesArray) {
+                                const extension = file.name
+                                  .slice(file.name.lastIndexOf("."))
+                                  .toLowerCase();
+                                const expectedType =
+                                  EXTENSION_TO_TYPE_MAP[extension];
+
+                                const isValidType =
+                                  expectedType &&
+                                  (file.type === expectedType ||
+                                    file.type === "");
+
+                                if (!isValidType) {
+                                  rejectedFiles.push(
+                                    `${file.name} (extensión o tipo no permitido)`
+                                  );
+                                  continue;
+                                }
+
+                                if (file.size > MAX_FILE_SIZE_BYTES) {
+                                  rejectedFiles.push(
+                                    `${file.name} (excede ${MAX_FILE_SIZE_MB}MB)`
+                                  );
+                                  continue;
+                                }
+
+                                validFiles.push(file);
+                              }
+
+                              // Mostrar toast si hay archivos rechazados
+                              if (rejectedFiles.length > 0) {
+                                toast.error(
+                                  <>
+                                    <p className="font-semibold">
+                                      Se rechazaron algunos archivos:
+                                    </p>
+                                    <ul className="ml-4 list-disc">
+                                      {rejectedFiles.map((msg, i) => (
+                                        <li key={i}>{msg}</li>
+                                      ))}
+                                    </ul>
+                                  </>
+                                );
+                              }
+
+                              // Combinar y filtrar duplicados
                               const combinedFiles = [
                                 ...selectedFiles,
-                                ...newFilesArray,
+                                ...validFiles,
                               ];
-
                               const uniqueCombinedFiles = combinedFiles.filter(
                                 (file, index, self) =>
                                   index ===

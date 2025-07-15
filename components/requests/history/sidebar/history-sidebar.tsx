@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { CheckCircle, Plus } from "lucide-react";
 import { HistoryList } from "./history-list";
 import { useRequestHistory } from "@/hooks/use-requests";
 import { useEffect, useState } from "react";
@@ -34,6 +34,11 @@ export function HistorySidebar({ requestId }: HistorySidebarProps) {
     }
   }, [history, setHistoryItem]);
 
+  // Verificar si hay una entrada que indique que fue completada
+  const isCompletedAndClosed = history.some(
+    (item) => item.message === "Solicitud marcada como completada y cerrada."
+  );
+
   return (
     <>
       {isReplyModalOpen && (
@@ -51,10 +56,24 @@ export function HistorySidebar({ requestId }: HistorySidebarProps) {
               Acciones y eventos relacionados con esta solicitud.
             </CardDescription>
           </div>
-          <Button onClick={() => setIsReplyModalOpen(true)}>
-            <Plus />
-            Crear respuesta
-          </Button>
+          {!isLoadingHisotry &&
+            (isCompletedAndClosed ? (
+              <div className="flex items-start gap-3 rounded-md bg-emerald-100 border border-emerald-200 p-4 text-emerald-800">
+                <CheckCircle className="h-5 w-5 mt-0.5 text-emerald-600" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Solicitud completada</p>
+                  <p className="text-sm">
+                    Esta solicitud ya fue completada y cerrada. No es posible
+                    agregar más respuestas.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Button onClick={() => setIsReplyModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Crear respuesta
+              </Button>
+            ))}
         </CardHeader>
         <CardContent className="flex-1 min-h-0">
           <div className="h-full">

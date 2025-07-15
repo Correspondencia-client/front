@@ -32,6 +32,7 @@ import {
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
 } from "@/constants/queries";
+import { RequestAssignAreaModal } from "./request-assign-area-modal";
 
 interface MyRequestFilters {
   search: string;
@@ -44,6 +45,9 @@ export function MyRequestsContent() {
   const { status } = useRequestStatusStore();
 
   const [isLoadingCompleted, startTransition] = useTransition();
+
+  // Estado para el modal de asignación de área
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   // Estado para el modal de detalle de solicitud
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -113,17 +117,31 @@ export function MyRequestsContent() {
     });
   };
 
+  const onHandleMarkAsCompleted = (request: AssignedRequestItem) => {
+    setSelectedRequest(request);
+    setIsCompleteModalOpen(true);
+  };
+
+  const handleTransferRequest = (request: AssignedRequestItem) => {
+    setSelectedRequest(request);
+    setIsAssignModalOpen(true);
+  };
+
   const columns = getAssignedRequestColumns(
     handleViewRequest,
     handleReplyRequest,
-    (request) => {
-      setSelectedRequest(request);
-      setIsCompleteModalOpen(true);
-    }
+    onHandleMarkAsCompleted,
+    handleTransferRequest
   );
 
   return (
     <>
+      <RequestAssignAreaModal
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        request={selectedRequest}
+      />
+
       <CompleteRequestDialog
         isLoading={isLoadingCompleted}
         isOpen={isCompleteModalOpen}

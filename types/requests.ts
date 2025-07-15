@@ -109,3 +109,8 @@ export interface RequestHistoryItem {
     email: string;
   };
 }
+
+export interface AssignAreaPayload {
+  toAreaId: string;
+  message: string;
+}

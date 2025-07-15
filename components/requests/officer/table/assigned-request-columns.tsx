@@ -1,9 +1,25 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowRightLeft, Eye, Clock, Reply, CheckCircle } from "lucide-react";
+import {
+  ArrowRightLeft,
+  Eye,
+  Clock,
+  Reply,
+  CheckCircle,
+  MoreVertical,
+} from "lucide-react";
 import { AssignedRequestItem } from "@/types/requests";
-import { cn } from "@/lib/utils";
+import { differenceInCalendarDays, isPast, isToday } from "date-fns";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useHistoryStore } from "@/stores/history-store";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -64,74 +80,114 @@ export function getAssignedRequestColumns(
       ),
     },
     {
+      id: "daysLeft",
+      header: "Días restantes",
+      cell: ({ row }) => {
+        const { status, deadline } = row.original;
+        const deadlineDate = new Date(deadline);
+        const today = new Date();
+
+        let colorClass = "";
+        let text = "";
+
+        if (status === "COMPLETED") {
+          text = "Solicitud completada";
+          colorClass = "bg-gray-100 text-gray-700";
+        } else if (status === "OVERDUE") {
+          text = "Plazo vencido";
+          colorClass = "bg-red-100 text-red-700";
+        } else if (status === "PENDING" || status === "IN_REVIEW") {
+          if (isToday(deadlineDate)) {
+            text = "Vence hoy";
+            colorClass = "bg-orange-100 text-orange-700";
+          } else if (isPast(deadlineDate)) {
+            text = "Vencido";
+            colorClass = "bg-red-100 text-red-700";
+          } else {
+            const daysLeft = differenceInCalendarDays(deadlineDate, today);
+            text = `${daysLeft} días`;
+            colorClass = "bg-green-100 text-green-700";
+          }
+        } else {
+          // Por si aparece un estado desconocido
+          return null;
+        }
+
+        return <Badge className={colorClass}>{text}</Badge>;
+      },
+    },
+    {
       id: "actions",
       header: "Acciones",
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(row.original)}
-          >
-            <Eye className="h-4 w-4 mr-1" />
-            Ver
-          </Button>
+      cell: ({ row }) => {
+        const { clearHistoryItem } = useHistoryStore();
 
-          {onReply && (
-            <>
-              <Button
-                variant="default"
-                size="sm"
-                className={cn(
-                  "bg-emerald-100 text-emerald-700 hover:bg-emerald-200",
-                  (row.original.status === "IN_REVIEW" ||
-                    row.original.status === "COMPLETED") &&
-                    "hidden"
-                )}
-                onClick={() => onReply(row.original)}
-              >
-                <Reply className="h-4 w-4 mr-1" />
-                Contestar
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5" />
               </Button>
-              <Link
-                href={`/solicitudes/historial/${row.original.id}`}
-                className={cn(
-                  "inline-flex bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all h-8 gap-1.5 px-3 has-[>svg]:px-2.5"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onView(row.original)}>
+                <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
+                Ver
+              </DropdownMenuItem>
+
+              {onReply &&
+                row.original.status !== "IN_REVIEW" &&
+                row.original.status !== "COMPLETED" && (
+                  <DropdownMenuItem
+                    onClick={() => onReply(row.original)}
+                    className="text-emerald-600 focus:bg-emerald-100 focus:text-emerald-700"
+                  >
+                    <Reply className="h-4 w-4 mr-2 text-emerald-600" />
+                    Contestar
+                  </DropdownMenuItem>
                 )}
-              >
-                <Reply className="h-4 w-4 mr-1" />
-                Historial
-              </Link>
-            </>
-          )}
 
-          {onComplete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "text-green-700 hover:text-green-900",
-                row.original.status !== "IN_REVIEW" && "hidden"
+              {onReply && (
+                <DropdownMenuItem
+                  asChild
+                  className="text-blue-600 focus:bg-blue-100 focus:text-blue-700"
+                >
+                  <Link
+                    href={`/solicitudes/historial/${row.original.id}`}
+                    onClick={clearHistoryItem}
+                  >
+                    <Reply className="h-4 w-4 mr-2 text-blue-600" />
+                    Ver historial
+                  </Link>
+                </DropdownMenuItem>
               )}
-              onClick={() => onComplete(row.original)}
-            >
-              <CheckCircle className="h-4 w-4 mr-1" />
-              Completar
-            </Button>
-          )}
 
-          {onTransfer && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onTransfer(row.original)}
-            >
-              <ArrowRightLeft className="h-4 w-4 mr-1" />
-              Transferir
-            </Button>
-          )}
-        </div>
-      ),
+              {onComplete && row.original.status === "IN_REVIEW" && (
+                <DropdownMenuItem
+                  onClick={() => onComplete(row.original)}
+                  className="text-green-600 focus:bg-green-100 focus:text-green-700"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                  Completar
+                </DropdownMenuItem>
+              )}
+
+              {onTransfer && (
+                <DropdownMenuItem
+                  onClick={() => onTransfer(row.original)}
+                  className={cn(
+                    "text-gray-600 focus:bg-gray-100 focus:text-gray-800",
+                    row.original.status === "COMPLETED" && "hidden"
+                  )}
+                >
+                  <ArrowRightLeft className="h-4 w-4 mr-2 text-gray-600" />
+                  Transferir
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 }

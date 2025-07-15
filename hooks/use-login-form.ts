@@ -11,6 +11,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { useAreaSelection } from "@/stores/area-selection";
 import { useHistoryStore } from "@/stores/history-store";
+import { useRequestStatusStore } from "@/stores/request-status";
 
 export function useLoginForm() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export function useLoginForm() {
   const { setEntity, clearSelection } = useEntitySelection();
   const { clearHistoryItem } = useHistoryStore();
   const { clearArea } = useAreaSelection();
+  const { setStatus } = useRequestStatusStore()
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -40,6 +42,7 @@ export function useLoginForm() {
       clearArea();
       clearUser();
       clearHistoryItem();
+      setStatus("PENDING")
 
       const { email, fullName, id, role, entity, area } = response.data;
 

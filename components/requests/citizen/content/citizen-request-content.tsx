@@ -41,6 +41,12 @@ import { Loader, Paperclip, Send, X } from "lucide-react";
 import { MobileEntitySelector } from "@/components/common/mobile-entity-selector";
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import {
+  ALLOWED_FILE_TYPES,
+  EXTENSION_TO_TYPE_MAP,
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB,
+} from "@/constants/files";
 
 export function CitizenRequestContent() {
   const { selectedEntity } = useEntitySelection();
@@ -67,7 +73,7 @@ export function CitizenRequestContent() {
       // Crear un nuevo FileList para actualizar el campo del formulario
       const dataTransfer = new DataTransfer();
       updatedFiles.forEach((file) => dataTransfer.items.add(file));
-      form.setValue("attachment", dataTransfer.files);
+      form.setValue("attachment", dataTransfer.files, { shouldValidate: true });
 
       // Si no quedan archivos, resetear el input de archivo para permitir re-selección
       if (updatedFiles.length === 0) {
@@ -295,19 +301,67 @@ export function CitizenRequestContent() {
                           <Input
                             id="attachment-upload"
                             type="file"
+                            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
                             multiple // Permitir múltiples archivos
                             className="hidden"
                             onChange={(event) => {
                               const files = event.target.files;
+                              const rejectedFiles: string[] = [];
+
                               if (files && files.length > 0) {
-                                // Combinar los archivos nuevos con los existentes
                                 const newFilesArray = Array.from(files);
+                                const validFiles: File[] = [];
+
+                                for (const file of newFilesArray) {
+                                  const extension = file.name
+                                    .slice(file.name.lastIndexOf("."))
+                                    .toLowerCase();
+                                  const expectedType =
+                                    EXTENSION_TO_TYPE_MAP[extension];
+
+                                  const isValidType =
+                                    expectedType &&
+                                    (file.type === expectedType ||
+                                      file.type === "");
+
+                                  if (!isValidType) {
+                                    rejectedFiles.push(
+                                      `${file.name} (extensión o tipo no permitido)`
+                                    );
+                                    continue;
+                                  }
+
+                                  if (file.size > MAX_FILE_SIZE_BYTES) {
+                                    rejectedFiles.push(
+                                      `${file.name} (excede ${MAX_FILE_SIZE_MB}MB)`
+                                    );
+                                    continue;
+                                  }
+
+                                  validFiles.push(file);
+                                }
+
+                                // Mostrar toast si hay archivos rechazados
+                                if (rejectedFiles.length > 0) {
+                                  toast.error(
+                                    <>
+                                      <p className="font-semibold">
+                                        Se rechazaron algunos archivos:
+                                      </p>
+                                      <ul className="ml-4 list-disc">
+                                        {rejectedFiles.map((msg, i) => (
+                                          <li key={i}>{msg}</li>
+                                        ))}
+                                      </ul>
+                                    </>
+                                  );
+                                }
+
+                                // Combinar y filtrar duplicados
                                 const combinedFiles = [
                                   ...selectedFiles,
-                                  ...newFilesArray,
+                                  ...validFiles,
                                 ];
-
-                                // Eliminar duplicados si es necesario (por nombre y tamaño)
                                 const uniqueCombinedFiles =
                                   combinedFiles.filter(
                                     (file, index, self) =>
@@ -321,18 +375,15 @@ export function CitizenRequestContent() {
 
                                 setSelectedFiles(uniqueCombinedFiles);
 
-                                // Crear un nuevo FileList para react-hook-form
                                 const dataTransfer = new DataTransfer();
                                 uniqueCombinedFiles.forEach((file) =>
                                   dataTransfer.items.add(file)
                                 );
                                 onChange(dataTransfer.files);
                               } else if (selectedFiles.length === 0) {
-                                // Si no se seleccionó nada y no había archivos, limpiar
                                 onChange(undefined);
                                 setSelectedFiles([]);
                               }
-                              // Si se cancela la selección pero ya había archivos, no hacer nada
                             }}
                             {...fieldProps}
                           />
