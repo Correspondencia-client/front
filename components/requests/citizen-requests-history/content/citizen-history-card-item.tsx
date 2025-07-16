@@ -20,16 +20,16 @@ export function CitizenHistoryCardItem({
     >
       {/* Sombra y borde mejorados */}
       <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-3">
-              <h3 className="font-bold text-xl text-foreground uppercase">
+              <h3 className="font-bold text-xl text-gray-800">
                 {request.subject}
               </h3>
             </div>
             <div className="flex items-center gap-2">
               {/* <FileText className="h-4 w-4 text-primary" /> */}
-              <span className="font-medium">Tipo de Procedimiento:</span>{" "}
+              <span className="font-medium">Procedimiento:</span>{" "}
               <span className="text-primary">{request.procedure.name}</span>
             </div>
           </div>
@@ -44,7 +44,7 @@ export function CitizenHistoryCardItem({
         </div>
 
         {/* Detalles con iconos y mejor grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 text-sm text-muted-foreground mt-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-8 gap-y-3 text-sm text-muted-foreground mt-4 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
             <span className="font-medium">Fecha:</span>{" "}

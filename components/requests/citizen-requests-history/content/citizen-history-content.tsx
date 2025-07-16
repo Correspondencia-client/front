@@ -19,6 +19,7 @@ import { CitizenHistoryCardItem } from "./citizen-history-card-item";
 import { CitizenHistoryCardItemSkeleton } from "../skeletons/citizen-history-card-item-skeleton";
 import { Paginator } from "@/components/common/paginator";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface MyRequestFilters {
   search: string;
@@ -110,7 +111,12 @@ export function CitizenHistoryContent() {
           </CardHeader>
         )}
 
-        <CardContent className="space-y-4">
+        <CardContent
+          className={cn(
+            "grid grid-cols-1 md:grid-cols-2 gap-4 space-y-4",
+            requestData && requestData.requests.length === 0 && "grid-cols-1"
+          )}
+        >
           {isLoadingRequests ? (
             // Estado de carga
             Array.from({ length: 5 }).map((_, i) => (
