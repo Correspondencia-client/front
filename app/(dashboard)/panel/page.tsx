@@ -1,20 +1,13 @@
 import { SiteHeader } from "@/components/navigation/site-header";
-import React from "react";
+import { CitizenPanelContentWrapper } from "@/components/panel/citizen/content/citizen-panel-content-wrapper";
 
 export default function DashboardPage() {
   return (
-    <div className="relative h-dvh overflow-y-auto">
+    <div className="relative h-dvh overflow-y-hidden pt-12">
       <SiteHeader title="Panel" />
-      <div className="flex flex-col gap-6">
-        <h2>Panel</h2>
-        <div className="h-[300px] bg-red-50"></div>
-        <div className="h-[300px] bg-red-50"></div>
-        <div className="h-[300px] bg-red-50"></div>
-        <div className="h-[300px] bg-red-50"></div>
-        <div className="h-[300px] bg-red-50"></div>
-        <div className="h-[300px] bg-red-50"></div>
+      <div className="flex h-full">
+        <CitizenPanelContentWrapper />
       </div>
-      <h3>No se corta el contenido</h3>
     </div>
   );
 }

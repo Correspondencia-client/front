@@ -6,7 +6,6 @@ import {
 import {
   ApiAssignedRequestsResponse,
   AssignAreaPayload,
-  AssignedRequestItem,
   AssignedRequestParams,
   AssignedRequestsResponse,
   RequestHistoryItem,

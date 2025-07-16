@@ -12,6 +12,7 @@ import {
   getMyRequests,
   getMyRequestsCount,
   getRequestHistory,
+  RequestsCountByStatus,
 } from "@/utils/requests";
 import { AssignedRequestParams, RequestHistoryItem } from "@/types/requests";
 
@@ -47,7 +48,7 @@ export function useMyAssignedRequestsCountByStatus() {
 }
 
 export function useMyRequestsCount() {
-  return useQuery({
+  return useQuery<RequestsCountByStatus>({
     queryKey: [MY_REQUESTS_COUNT_QUERY_KEY],
     queryFn: getMyRequestsCount,
   });
