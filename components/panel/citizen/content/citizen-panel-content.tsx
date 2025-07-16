@@ -14,20 +14,18 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useMyRequestsCount } from "@/hooks/use-requests";
-import { useAuthStore } from "@/stores/auth-store";
-import { RequestStatus } from "@/types/requests";
 import {
-  CalendarX,
-  CheckCircle,
-  FileText,
-  Inbox,
-  PlusCircle,
-  TrendingUp,
-} from "lucide-react";
+  useMyAssignedRequestsCountByStatus,
+  useMyRequests,
+  useMyRequestsCount,
+} from "@/hooks/use-requests";
+import { useAuthStore } from "@/stores/auth-store";
+import { PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, Cell } from "recharts";
+import { RecentRequestsSkeleton } from "../skeletons/recent-requests-skeleton";
+import { SimpleChartSkeleton } from "../skeletons/simple-chart-skeleton";
+import { RecentRequestsItem } from "./recent-requests-item";
 
 // Configuración del gráfico
 const chartConfig = {
@@ -37,28 +35,70 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const requestsByEntity = [
+  { entityName: "Alcaldía Municipal", count: 20, fill: "var(--chart-1)" },
+  { entityName: "Gobernación", count: 32, fill: "var(--chart-2)" },
+  { entityName: "Secretaría de Salud", count: 28, fill: "var(--chart-3)" },
+  // ... más entidades
+];
+
 export function CitizenPanelContent() {
   const { user } = useAuthStore();
-  const [greeting, setGreeting] = useState("Bienvenido");
-  const [loading, setLoading] = useState(false);
 
   const { data: countsByStatus, isLoading: isLoadingCounts } =
     useMyRequestsCount();
 
+  const { data: officerCountsByStatus, isLoading: isLoadingOfficerCounts } =
+    useMyAssignedRequestsCountByStatus();
+
+  const { data: requestData, isLoading: isLoadingRequests } = useMyRequests({
+    status: "PENDING",
+    page: 1,
+    limit: 5,
+  });
+
   // Datos del gráfico con colores específicos
+  const counts =
+    user?.role === "CITIZEN" ? countsByStatus : officerCountsByStatus;
+
   const statusChartData = [
-    { status: "Pendientes", value: countsByStatus?.["PENDING" as RequestStatus], fill: "#9ca3af" },
-    { status: "En Revisión", value: countsByStatus?.["IN_REVIEW" as RequestStatus], fill: "#fcd34d" },
-    { status: "Completadas", value: countsByStatus?.["COMPLETED" as RequestStatus], fill: "#22c55e" },
-    { status: "Vencidas", value: countsByStatus?.["OVERDUE" as RequestStatus], fill: "#ef4444" },
+    {
+      status: "Pendientes",
+      value: counts?.["PENDING"] ?? 0,
+      fill: "#9ca3af",
+    },
+    {
+      status: "En Revisión",
+      value: counts?.["IN_REVIEW"] ?? 0,
+      fill: "#fcd34d",
+    },
+    {
+      status: "Completadas",
+      value: counts?.["COMPLETED"] ?? 0,
+      fill: "#22c55e",
+    },
+    {
+      status: "Vencidas",
+      value: counts?.["OVERDUE"] ?? 0,
+      fill: "#ef4444",
+    },
   ];
 
+  const isEmptyChart = statusChartData.every((item) => item.value === 0);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-700">
-          {greeting}, <span className="text-primary">{user?.fullName}</span>
-        </h2>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-700">
+            Bienvenido,{" "}
+            <span className="text-muted-foreground">{user?.fullName}</span>
+          </h2>
+          <p className="text-muted-foreground">
+            Este es el portal ciudadano con acceso directo para crear nuevas
+            solicitudes de manera rápida y sencilla.
+          </p>
+        </div>
 
         <div className="flex items-center space-x-2">
           <Button asChild>
@@ -70,93 +110,86 @@ export function CitizenPanelContent() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Tarjeta de Solicitudes Pendientes */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Solicitudes Pendientes
-            </CardTitle>
-            <Inbox className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{2}</div>
-            <p className="text-xs text-muted-foreground">
-              Solicitudes esperando acción
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Tarjeta de Solicitudes Completadas */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Solicitudes Completadas
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{4}</div>
-            <p className="text-xs text-muted-foreground">
-              Solicitudes finalizadas con éxito
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Tarjeta de Solicitudes Vencidas */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Solicitudes Vencidas
-            </CardTitle>
-            <CalendarX className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{1}</div>
-            <p className="text-xs text-muted-foreground">
-              Requieren atención urgente
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Gráfica de Estado de Solicitudes */}
-      <div className="grid grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Estado General de Solicitudes</CardTitle>
-            <CardDescription>
-              Distribución de solicitudes por su estado actual.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingCounts ? (
-              <div className="flex items-center justify-center">
-                Cargando gráfica...
-              </div>
-            ) : (
+      <div className="grid grid-cols-2 gap-3">
+        {isLoadingCounts || isLoadingOfficerCounts ? (
+          <SimpleChartSkeleton />
+        ) : isEmptyChart ? (
+          <Card className="border border-dashed border-primary bg-primary/5">
+            <CardHeader className="items-center text-center">
+              <CardTitle className="text-lg text-muted-foreground">
+                Sin datos por mostrar
+              </CardTitle>
+              <CardDescription>
+                Aún no se han registrado solicitudes en el sistema.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <p className="text-sm text-muted-foreground">
+                Crea nuevas solicitudes para ver resultados en esta sección.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border border-dashed border-primary bg-primary/10">
+            <CardHeader>
+              <CardTitle>Estado general de tus solicitudes</CardTitle>
+              <CardDescription>
+                Distribución de solicitudes por su estado actual.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <ChartContainer config={chartConfig}>
-                <BarChart accessibilityLayer data={statusChartData}>
+                <BarChart
+                  className="bg-white p-4 rounded-lg"
+                  accessibilityLayer
+                  data={statusChartData}
+                >
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="status"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value}
+                    className="text-primary"
                   />
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />}
                   />
-                  <Bar dataKey="value" radius={8}>
+                  <Bar dataKey="value" radius={10}>
                     {statusChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Bar>
                 </BarChart>
               </ChartContainer>
-            )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* <RequestsByEntityChart data={requestsByEntity} isLoading={false} /> */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Solicitudes Recientes</CardTitle>
+            <CardDescription>
+              Últimas solicitudes registradas en el sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="">
+            <div className="space-y-2">
+              {isLoadingCounts || isLoadingRequests ? (
+                <RecentRequestsSkeleton />
+              ) : requestData?.requests.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No hay solicitudes recientes registradas.
+                </p>
+              ) : (
+                requestData?.requests.map((request) => (
+                  <RecentRequestsItem key={request.id} request={request} />
+                ))
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
