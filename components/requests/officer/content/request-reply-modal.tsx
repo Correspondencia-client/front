@@ -1,4 +1,5 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Send, Paperclip, X, Loader, Wand2 } from "lucide-react";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { RichTextEditor } from "@/components/common/rich-text-editor";
 import {
   replyRequestFormSchema,
@@ -44,6 +45,8 @@ import {
   MAX_FILE_SIZE_MB,
 } from "@/constants/files";
 import { Textarea } from "@/components/ui/textarea";
+import api from "@/lib/axios";
+import { AxiosError } from "axios";
 
 interface ReplyModalProps {
   isOpen: boolean;
@@ -72,69 +75,49 @@ export function RequestReplyModal({
   const { isValid, isSubmitting } = form.formState;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  // const mounted = useRef(false);
 
-  // useEffect(() => {
-  //   mounted.current = true;
-  //   return () => {
-  //     mounted.current = false;
-  //   };
-  // }, []);
+  const handleGenerateWithIA = async () => {
+    console.log("ENTRANDO A GENERAR CON IA");
 
-  // const handleGenerateWithAI = useDebouncedCallback(async () => {
-  //   const prompt = form.getValues("aiPrompt");
+    const prompt = form.getValues("aiPrompt");
 
-  //   if (!prompt) {
-  //     if (mounted.current) {
-  //       form.setError("aiPrompt", {
-  //         message: "Por favor, ingresa un prompt para generar el documento.",
-  //       });
-  //     }
-  //     return;
-  //   }
+    if (!prompt) {
+      form.setError("aiPrompt", {
+        message: "Por favor, escribe un prompt",
+      });
+      return;
+    }
 
-  //   if (mounted.current) {
-  //     setIsGeneratingAI(true);
-  //     form.clearErrors("aiPrompt");
-  //   }
+    try {
+      setIsGeneratingAI(true);
+      form.clearErrors("aiPrompt");
 
-  //   try {
-  //     const res = await fetch("/api/generate-text", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ prompt, request }), // <--- Aquí envías el objeto request
-  //     });
-  //     const data = await res.json();
-  //     let html = data.text;
+      const res = await api.post(`/ia/${requestId}`);
 
-  //     // Si la respuesta viene envuelta en un bloque ```html ... ```
-  //     if (typeof html === "string") {
-  //       html = html.trim();
-  //       if (html.startsWith("```html")) {
-  //         html = html.replace(/^```html/, "").replace(/```$/, "").trim();
-  //       }
-  //     }
+      console.log(res);
 
-  //     if (res.ok) {
-  //       if (mounted.current) {
-  //         form.setValue("description", html, { shouldValidate: true });
-  //         form.setValue("aiPrompt", "");
-  //       }
-  //     } else {
-  //       if (mounted.current) {
-  //         form.setError("aiPrompt", { message: data.error || "Error de IA" });
-  //       }
-  //     }
-  //   } catch (error) {
-  //     if (mounted.current) {
-  //       form.setError("aiPrompt", { message: "Error de red o del servidor" });
-  //     }
-  //   } finally {
-  //     if (mounted.current) {
-  //       setIsGeneratingAI(false);
-  //     }
-  //   }
-  // }, 500);
+      const { data } = res;
+      if (res.status !== 201) throw new Error(data.error || "Error al generar");
+
+      let html = data.text?.trim() || "";
+
+      // if (html.startsWith("```html")) {
+      //   html = html
+      //     .replace(/^```html
+      //     .replace(/```$/, "")
+      //     .trim();
+      // }
+
+      form.setValue("description", html, { shouldValidate: true });
+      form.setValue("aiPrompt", "");
+      toast.success("Texto generado con IA.");
+    } catch (err) {
+      console.log(err as AxiosError);
+      toast.error("Error al generar texto.");
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   const handleRemoveFile = useCallback(
     (fileToRemove: File) => {
@@ -237,7 +220,7 @@ export function RequestReplyModal({
                     <FormLabel>Prompt para IA</FormLabel>
                     <FormControl>
                       <Textarea
-                      className="bg-white"
+                        className="bg-white"
                         placeholder="Ej: Genera una respuesta formal sobre el estado de la solicitud de presupuesto."
                         {...field}
                       />
@@ -252,12 +235,15 @@ export function RequestReplyModal({
               />
               <Button
                 type="button"
-                onClick={() => {}}
+                onClick={handleGenerateWithIA}
                 className="mt-4 w-full bg-purple-400 hover:bg-purple-500"
                 disabled={isGeneratingAI}
               >
                 {isGeneratingAI ? (
-                  <>Generando...</>
+                  <>
+                    <Loader className="animate-spin" />
+                    Generando...
+                  </>
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />

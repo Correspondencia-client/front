@@ -42,12 +42,12 @@ export const routes = {
     },
     {
       title: "Nueva solicitud",
-      url: "/solicitudes/ciudadano/nueva-solicitud",
+      url: "/solicitudes/funcionario/nueva-solicitud",
       icon: PlusCircle,
     },
     {
       title: "Mis solicitudes",
-      url: "/solicitudes/ciudadano/mis-solicitudes",
+      url: "/solicitudes/funcionario/mis-solicitudes",
       icon: FileText,
     },
   ],
@@ -75,6 +75,11 @@ export const routes = {
       name: "Áreas y tipos de procesos",
       url: "/gestion-areas/admin",
       icon: Building,
+    },
+    {
+      name: "Solicitudes asignadas",
+      url: "/solicitudes/funcionario/mis-asignaciones",
+      icon: FileText,
     },
   ],
   administrationSuperAdmin: [

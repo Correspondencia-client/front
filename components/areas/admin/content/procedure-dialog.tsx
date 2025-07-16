@@ -23,6 +23,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,6 +65,7 @@ export function ProcedureDialog({
       name: "",
       description: "",
       maxResponseDays: "0",
+      pqrsType: "",
     },
   });
 
@@ -67,6 +75,7 @@ export function ProcedureDialog({
         name: procedureToEdit.name,
         description: procedureToEdit.description,
         maxResponseDays: String(procedureToEdit.maxResponseDays),
+        pqrsType: procedureToEdit.pqrsType || "",
       });
     } else {
       form.reset();
@@ -79,6 +88,7 @@ export function ProcedureDialog({
         name: "",
         description: "",
         maxResponseDays: "0",
+        pqrsType: "",
       });
     }
   }, [open, procedureToEdit, form]);
@@ -113,7 +123,7 @@ export function ProcedureDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Editar procedimiento" : "Nuevo procedimiento"}
@@ -164,6 +174,23 @@ export function ProcedureDialog({
                   <FormDescription>
                     Explica brevemente en qué consiste el procedimiento.
                   </FormDescription>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="pqrsType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código PQRS</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ejemplo: PQRS-2024-001" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Ingresa el código identificador del procedimiento PQRS.
+                  </FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />

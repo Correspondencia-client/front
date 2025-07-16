@@ -89,7 +89,8 @@ export interface RequestHistoryItem {
   } | null;
 
   // Documentos adjuntos
-  Document: DocumentItem[];
+  Document?: DocumentItem[];
+  documents: DocumentItem[];
 
   // Usuario que hizo la acción
   updatedBy: RequestHistoryUser;

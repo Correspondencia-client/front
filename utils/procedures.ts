@@ -3,6 +3,8 @@ import { ProcedureFormValues } from "@/schemas/procedure";
 import {
   GetProceduresByAreaParams,
   GetProceduresByAreaResponse,
+  GetProceduresByEntityParams,
+  GetProceduresByEntityResponse,
 } from "@/types/procedure";
 import { AxiosError } from "axios";
 
@@ -20,6 +22,27 @@ export async function getProceduresByArea(
   } catch (error) {
     const err = error as AxiosError;
     console.error("Error al obtener áreas:", err);
+
+    return {
+      procedures: [],
+    };
+  }
+}
+
+export async function getProceduresByEntity(
+  params: GetProceduresByEntityParams
+): Promise<GetProceduresByEntityResponse> {
+  try {
+    const response = await api.get(`/procedure/${params.entityId}`, {
+      params,
+    });
+
+    return {
+      procedures: response.data ?? [],
+    };
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Error al obtener los procesos:", err);
 
     return {
       procedures: [],
@@ -45,8 +68,12 @@ export const updateProcedure = async (
   areaId: string,
   data: ProcedureFormValues
 ) => {
-  console.log({ id, areaId, ...data })
-  return api.patch(`/procedure/${id}`, { ...data, areaId, maxResponseDays: Number(data.maxResponseDays) });
+  console.log({ id, areaId, ...data });
+  return api.patch(`/procedure/${id}`, {
+    ...data,
+    areaId,
+    maxResponseDays: Number(data.maxResponseDays),
+  });
 };
 
 export async function deleteProcedure(id: string): Promise<void> {

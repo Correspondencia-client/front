@@ -13,6 +13,7 @@ export const procedureFormSchema = z.object({
         message: "Debe ser un número entero mayor a 0",
       }
     ),
+  pqrsType: z.string().min(1, "El tipo PQRS es requerido"),
 });
 
 export type ProcedureFormValues = z.infer<typeof procedureFormSchema>;

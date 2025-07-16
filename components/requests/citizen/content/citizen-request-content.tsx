@@ -42,14 +42,21 @@ import { MobileEntitySelector } from "@/components/common/mobile-entity-selector
 import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
-  ALLOWED_FILE_TYPES,
   EXTENSION_TO_TYPE_MAP,
   MAX_FILE_SIZE_BYTES,
   MAX_FILE_SIZE_MB,
 } from "@/constants/files";
+import { useAuthStore } from "@/stores/auth-store";
+import { useProceduresByEntity } from "@/hooks/use-procedures";
 
 export function CitizenRequestContent() {
+  const { user } = useAuthStore();
   const { selectedEntity } = useEntitySelection();
+
+  const { data: procedures, isLoading: isLoadingProcedures } =
+    useProceduresByEntity({
+      entityId: selectedEntity?.id || "",
+    });
 
   const form = useForm<CitizenRequestFormValues>({
     resolver: zodResolver(citizenRequestFormSchema),
@@ -105,9 +112,11 @@ export function CitizenRequestContent() {
     }
   };
 
+  const requestProcedures = procedures?.procedures || [];
+
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-      <div>
+      <div className="px-2 pt-6">
         <h2 className="text-2xl font-bold tracking-tight">
           Crear nueva solicitud
         </h2>
@@ -117,11 +126,13 @@ export function CitizenRequestContent() {
         </p>
       </div>
 
-      <MobileEntitySelector
-        title="Información de la entidad"
-        description="Seleccione el tipo de entidad y la entidad específica a la que desea
+      {user?.role === "CITIZEN" && (
+        <MobileEntitySelector
+          title="Información de la entidad"
+          description="Seleccione el tipo de entidad y la entidad específica a la que desea
             dirigir su solicitud."
-      />
+        />
+      )}
 
       <Card>
         <CardHeader>
@@ -145,8 +156,8 @@ export function CitizenRequestContent() {
                       value={field.value}
                       disabled={
                         !selectedEntity ||
-                        !selectedEntity.procedures ||
-                        selectedEntity.procedures.length === 0
+                        requestProcedures.length === 0 ||
+                        isLoadingProcedures
                       }
                     >
                       <FormControl>
@@ -161,7 +172,7 @@ export function CitizenRequestContent() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {selectedEntity?.procedures?.map((entity) => (
+                        {requestProcedures?.map((entity) => (
                           <SelectItem key={entity.id} value={entity.id}>
                             {entity.name}
                           </SelectItem>

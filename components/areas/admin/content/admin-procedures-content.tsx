@@ -60,6 +60,8 @@ export function AdminProceduresContent() {
       areaId: selectedArea?.id ?? "",
     });
 
+    console.log(procedureData?.procedures)
+
   useEffect(() => {
     if (areaData?.areas && areaData.areas.length > 0 && !selectedArea) {
       setArea(areaData.areas[0]);

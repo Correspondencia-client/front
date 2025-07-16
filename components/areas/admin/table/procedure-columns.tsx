@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { Procedure } from "@/types/procedure";
+import { Badge } from "@/components/ui/badge";
 
 export function getProcedureColumns(
   onEdit: (procedure: Procedure) => void,
@@ -23,6 +24,27 @@ export function getProcedureColumns(
           <p className="font-medium">{row.original.name}</p>
         </div>
       ),
+    },
+    {
+      accessorKey: "pqrsType",
+      header: "Tipo PQRS",
+      cell: ({ row }) => {
+        const pqrsType = row.original.pqrsType;
+
+        if (!pqrsType) {
+          return (
+            <Badge variant="outline" className="bg-gray-50 text-gray-500">
+              No especificado
+            </Badge>
+          );
+        }
+
+        return (
+          <Badge variant="outline">
+            {pqrsType}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "maxResponseDays",

@@ -34,6 +34,10 @@ export function RequestHistoryItem({
   const { user } = useAuthStore();
   const isMyResponse = item?.updatedBy?.email === user?.email;
 
+  const getDocuments = (itemValue: RequestHistoryItemType) => {
+    return itemValue.Document || itemValue.documents || [];
+  };
+
   return (
     <Card
       className={cn(
@@ -105,14 +109,14 @@ export function RequestHistoryItem({
           </div>
         )}
 
-        {item.Document && item.Document.length > 0 && (
+        {getDocuments(item).length > 0 && (
           <div className={cn("mt-4", type === "Desktop" ? "block" : "hidden")}>
             <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
               <Paperclip className="h-4 w-4 text-gray-600" />
               Documentos Adjuntos:
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {item.Document.map((doc) => (
+              {getDocuments(item).map((doc) => (
                 <a
                   href={doc.url}
                   target="_blank"
@@ -154,19 +158,19 @@ export function RequestHistoryItem({
                 </div>
               )}
 
-              {item.Document && item.Document.length > 0 && (
-                <div>
+              {getDocuments(item).length > 0 && (
+                <div className={cn("mt-4")}>
                   <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
                     <Paperclip className="h-4 w-4 text-gray-600" />
                     Documentos Adjuntos:
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {item.Document.map((doc) => (
+                    {getDocuments(item).map((doc) => (
                       <a
-                        key={doc.id}
                         href={doc.url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        key={doc.id}
                         className="flex items-center gap-2 p-2 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-sm"
                       >
                         <Download className="h-4 w-4 text-blue-600" />

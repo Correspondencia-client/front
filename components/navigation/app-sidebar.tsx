@@ -49,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavAdministrationSkeleton size={2} />
         ) : user.role === "CITIZEN" ? (
           <NavMain items={routes.citizenNavMain} />
-        ) : user.role === "OFFICER" ? (
+        ) : user.role === "OFFICER" || user.role === "ADMIN" ? (
           <NavMain items={routes.officerNavMain} />
         ) : (
           <NavMain items={routes.navMain} />
