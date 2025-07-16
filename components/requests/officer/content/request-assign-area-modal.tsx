@@ -86,7 +86,7 @@ export function RequestAssignAreaModal({
   }, [isOpen]);
 
   const handleSubmit = async (data: RequestAssignAreaFormValues) => {
-    if (!request) return;
+    if (!request) return; 
 
     try {
       await assignRequestToArea(request.id, data);
