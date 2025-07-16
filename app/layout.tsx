@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { SocketProvider } from "@/components/context/socket-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-          {children}
+          {/* <SocketProvider
+            serverUrl={
+              process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001"
+            }
+          > */}
+            {children}
+          {/* </SocketProvider> */}
           <Toaster richColors />
         </QueryProvider>
       </body>
