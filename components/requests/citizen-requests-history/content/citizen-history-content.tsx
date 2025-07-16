@@ -114,7 +114,9 @@ export function CitizenHistoryContent() {
         <CardContent
           className={cn(
             "grid grid-cols-1 md:grid-cols-2 gap-4 space-y-4",
-            requestData && requestData.requests.length === 0 && "grid-cols-1"
+            requestData &&
+              requestData.requests.length === 0 &&
+              "grid-cols-1 md:grid-cols-1"
           )}
         >
           {isLoadingRequests ? (
@@ -143,15 +145,19 @@ export function CitizenHistoryContent() {
             </div>
           )}
 
-          {requestData?.requests && requestData?.requests.length > 0 && (
-            <Paginator
-              currentPage={filters.page}
-              totalPages={Math.ceil((requestData?.total ?? 0) / filters.limit)}
-              limit={filters.limit}
-              onPageChange={(page) => updateFilters({ page })}
-              onLimitChange={(limit) => updateFilters({ limit })}
-            />
-          )}
+          <div className="col-span-1 md:col-span-2">
+            {requestData?.requests && requestData?.requests.length > 0 && (
+              <Paginator
+                currentPage={filters.page}
+                totalPages={Math.ceil(
+                  (requestData?.total ?? 0) / filters.limit
+                )}
+                limit={filters.limit}
+                onPageChange={(page) => updateFilters({ page })}
+                onLimitChange={(limit) => updateFilters({ limit })}
+              />
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
