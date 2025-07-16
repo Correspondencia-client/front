@@ -99,8 +99,9 @@ export function MyRequestsContent() {
 
   const handleMarkAsCompleted = () => {
     startTransition(async () => {
+      if (!selectedRequest) return;
       try {
-        await api.patch(`/requests/${selectedRequest!.id}/complete`);
+        await api.patch(`/requests/${selectedRequest?.id}/complete`);
         queryClient.invalidateQueries({
           queryKey: [MY_ASSIGNED_REQUESTS_QUERY_KEY],
           exact: false,
@@ -136,11 +137,13 @@ export function MyRequestsContent() {
 
   return (
     <>
-      <RequestAssignAreaModal
-        isOpen={isAssignModalOpen}
-        onClose={() => setIsAssignModalOpen(false)}
-        request={selectedRequest}
-      />
+      {selectedRequest && (
+        <RequestAssignAreaModal
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          request={selectedRequest}
+        />
+      )}
 
       <CompleteRequestDialog
         isLoading={isLoadingCompleted}
@@ -162,7 +165,7 @@ export function MyRequestsContent() {
         <RequestReplyModal
           isOpen={isReplyModalOpen}
           onClose={() => setIsReplyModalOpen(false)}
-          requestId={selectedRequest.id}
+          requestId={selectedRequest?.id}
         />
       )}
 

@@ -1,3 +1,5 @@
+"use client"
+
 import { SiteHeader } from "@/components/navigation/site-header";
 import { MyRequestsContentWrapper } from "@/components/requests/officer/content/my-requests-content-wrapper";
 

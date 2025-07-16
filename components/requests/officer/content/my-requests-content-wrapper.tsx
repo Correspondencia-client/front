@@ -1,3 +1,5 @@
+"use client"
+
 import { MyRequestsContent } from "./my-requests-content";
 
 export function MyRequestsContentWrapper() {

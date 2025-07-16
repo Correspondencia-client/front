@@ -1,50 +1,15 @@
-"use client";
-
-import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { AxiosError } from "axios";
-import { toast } from "sonner";
-import api from "@/lib/axios";
+import { VerifyEmailContent } from "@/components/auth-content/verify-email-content";
+import { Suspense } from "react";
 
 export default function VerifyEmailPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <VerifyEmailContent />
+    </Suspense>
+  );
+}
 
-  useEffect(() => {
-    const token = searchParams.get("token");
-
-    if (!token) {
-      toast.error("Verificación fallida", {
-        description: "Token no proporcionado.",
-      });
-      router.push("/iniciar-sesion");
-      return;
-    }
-
-    const verifyEmail = async () => {
-      try {
-        await api.get(`/auth/verify-email?token=${token}`);
-
-        toast.success("Correo verificado", {
-          description: "Tu cuenta ha sido verificada correctamente.",
-        });
-      } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string }>;
-
-        toast.error("Error al verificar el correo", {
-          description:
-            axiosError.response?.data?.message ??
-            axiosError.message ??
-            "Ocurrió un error inesperado al verificar el correo.",
-        });
-      } finally {
-        router.push("/iniciar-sesion");
-      }
-    };
-
-    verifyEmail();
-  }, [searchParams, router]);
-
+function LoadingSpinner() {
   return (
     <div className="h-screen w-full flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
@@ -71,8 +36,7 @@ export default function VerifyEmailPage() {
             strokeDashoffset="75"
           />
         </svg>
-
-        <p className="text-lg text-muted-foreground">Verificando correo...</p>
+        <p className="text-lg text-muted-foreground">Cargando...</p>
       </div>
     </div>
   );
