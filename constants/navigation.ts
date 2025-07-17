@@ -41,12 +41,12 @@ export const routes = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Nueva solicitud",
+      title: "Crear solicitud externa",
       url: "/solicitudes/funcionario/nueva-solicitud",
       icon: PlusCircle,
     },
     {
-      title: "Mis solicitudes",
+      title: "Mis solicitudes externas",
       url: "/solicitudes/funcionario/mis-solicitudes",
       icon: FileText,
     },

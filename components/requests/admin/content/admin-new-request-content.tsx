@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useEntitySelection } from "@/stores/entity-selection";
 import {
   Form,
   FormControl,
@@ -19,21 +18,13 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/common/rich-text-editor";
 import { toast } from "sonner";
 import {
-  citizenRequestFormSchema,
-  CitizenRequestFormValues,
+  adminRequestFormSchema,
+  AdminRequestFormValues,
 } from "@/schemas/request";
-import { createCitizenRequest } from "@/utils/requests";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -47,22 +38,17 @@ import {
   MAX_FILE_SIZE_MB,
 } from "@/constants/files";
 import { useAuthStore } from "@/stores/auth-store";
-import { useProceduresByEntity } from "@/hooks/use-procedures";
 
-export function CitizenRequestContent() {
+export function AdminNewRequestContent() {
   const { user } = useAuthStore();
-  const { selectedEntity } = useEntitySelection();
 
-  const { data: procedures, isLoading: isLoadingProcedures } =
-    useProceduresByEntity({
-      entityId: selectedEntity?.id || "",
-    });
-
-  const form = useForm<CitizenRequestFormValues>({
-    resolver: zodResolver(citizenRequestFormSchema),
+  const form = useForm<AdminRequestFormValues>({
+    resolver: zodResolver(adminRequestFormSchema),
     defaultValues: {
       title: "",
       description: "",
+      recipientEmail: "",
+      attachment: "",
     },
   });
 
@@ -96,9 +82,9 @@ export function CitizenRequestContent() {
 
   const { isValid, isSubmitting } = form.formState;
 
-  const onSubmit = async (values: CitizenRequestFormValues) => {
+  const onSubmit = async (values: AdminRequestFormValues) => {
     try {
-      await createCitizenRequest(values);
+      // await createCitizenRequest(values);
       toast.success("Solicitud enviada correctamente");
       form.reset();
       setSelectedFiles([]); // Limpiar los archivos seleccionados
@@ -111,13 +97,11 @@ export function CitizenRequestContent() {
     }
   };
 
-  const requestProcedures = procedures?.procedures || [];
-
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <div className="px-2 pt-6">
         <h2 className="text-2xl font-bold tracking-tight">
-          Crear nueva solicitud
+          Crear nueva solicitud externa
         </h2>
         <p className="text-muted-foreground">
           Complete el formulario para enviar su solicitud a la entidad
@@ -135,10 +119,9 @@ export function CitizenRequestContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Detalles de la Solicitud</CardTitle>
+          <CardTitle>Detalles de la solicitud</CardTitle>
           <CardDescription>
-            Proporcione un título claro y una descripción detallada de su
-            solicitud.
+            Resuma el objetivo de su solicitud en el título y utilice la descripción para explicar los detalles, antecedentes o requerimientos específicos.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -146,46 +129,59 @@ export function CitizenRequestContent() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
-                name="procedureId"
+                name="requestType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo de Solicitud</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={
-                        !selectedEntity ||
-                        requestProcedures.length === 0 ||
-                        isLoadingProcedures
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={
-                              selectedEntity
-                                ? "Seleccione el tipo de solicitud"
-                                : "Primero seleccione una entidad"
-                            }
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {requestProcedures?.map((entity) => (
-                          <SelectItem key={entity.id} value={entity.id}>
-                            {entity.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      {selectedEntity?.procedures?.length === 0
-                        ? "La entidad actualmente no posee procesos."
-                        : !selectedEntity
-                        ? "Debe seleccionar una entidad antes de elegir el tipo de solicitud."
-                        : "Seleccione el tipo de solicitud que mejor describe su petición."}
-                    </FormDescription>
+                    <FormLabel>Tipo o nombre de la solicitud</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Por ejemplo: Petición, Queja, Reclamo, Solicitud de información..."
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
+                    <FormDescription>
+                      Tipo o nombre de la solicitud
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="recipientName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del destinatario</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Nombre de la persona o empresa"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <FormDescription>Nombre del destinatario</FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="recipientEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo electrónico del destinatario</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="ejemplo@correo.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <FormDescription>
+                      Correo electrónico del destinatario
+                    </FormDescription>
                   </FormItem>
                 )}
               />
