@@ -76,11 +76,6 @@ export const routes = {
       url: "/gestion-areas/admin",
       icon: Building,
     },
-    {
-      name: "Solicitudes asignadas",
-      url: "/solicitudes/funcionario/mis-asignaciones",
-      icon: FileText,
-    },
   ],
   administrationSuperAdmin: [
     {
@@ -97,6 +92,13 @@ export const routes = {
       name: "Gestión de usuarios",
       url: "/gestion-usuarios/superadmin",
       icon: UsersIcon,
+    },
+  ],
+  navAdminRequest: [
+    {
+      name: "Solicitudes asignadas",
+      url: "/solicitudes/funcionario/mis-asignaciones",
+      icon: FileText,
     },
   ],
   navSecondary: [

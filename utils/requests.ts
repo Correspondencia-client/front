@@ -26,7 +26,6 @@ export async function getMyRequestsCount(): Promise<RequestsCountByStatus> {
     "/requests/my-requests/count-by-status"
   );
 
-  console.log(response.data);
   return response.data;
 }
 
@@ -44,8 +43,6 @@ export async function getMyAssignedRequests(
     const { data, page, total, limit } = response.data;
 
     const requests = data ?? [];
-
-    console.log(requests);
 
     return {
       requests,
@@ -77,9 +74,6 @@ export async function getMyRequests(
     const { data, page, total, limit } = response.data;
 
     const requests = data ?? [];
-    console.log("REQUEST: ", requests)
-
-    console.log(requests);
 
     return {
       requests,

@@ -26,27 +26,6 @@ export function getProcedureColumns(
       ),
     },
     {
-      accessorKey: "pqrsType",
-      header: "Tipo PQRS",
-      cell: ({ row }) => {
-        const pqrsType = row.original.pqrsType;
-
-        if (!pqrsType) {
-          return (
-            <Badge variant="outline" className="bg-gray-50 text-gray-500">
-              No especificado
-            </Badge>
-          );
-        }
-
-        return (
-          <Badge variant="outline">
-            {pqrsType}
-          </Badge>
-        );
-      },
-    },
-    {
       accessorKey: "maxResponseDays",
       header: "Días máx. de respuesta",
       cell: ({ row }) => (

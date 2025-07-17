@@ -21,8 +21,6 @@ export async function getProceduresByArea(
     };
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error al obtener áreas:", err);
-
     return {
       procedures: [],
     };
@@ -42,8 +40,6 @@ export async function getProceduresByEntity(
     };
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error al obtener los procesos:", err);
-
     return {
       procedures: [],
     };

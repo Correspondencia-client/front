@@ -19,9 +19,12 @@ import { NavMain } from "./nav-main";
 import { routes } from "@/constants/navigation";
 import { NavAdministration } from "./nav-administration";
 import { NavAdministrationSkeleton } from "./skeletons/nav-administration-skeleton";
+import { NavAdminRequest } from "./nav-admin-request";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthStore();
+
+  console.log(user?.area?.id)
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -54,6 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ) : (
           <NavMain items={routes.navMain} />
         )}
+
         {!user ? (
           <NavAdministrationSkeleton size={routes.administrationAdmin.length} />
         ) : user.role === "OFFICER" ? (
@@ -65,7 +69,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <NavAdministration items={routes.administrationSuperAdmin} />
           )
         )}
-        {/*<NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+
+        {!user ? (
+          <NavAdministrationSkeleton size={routes.navAdminRequest.length} />
+        ) : (
+          user.role === "ADMIN" &&
+          user.area?.id !== undefined && (
+            <NavAdminRequest items={routes.navAdminRequest} />
+          )
+        )}
       </SidebarContent>
 
       <SidebarFooter>

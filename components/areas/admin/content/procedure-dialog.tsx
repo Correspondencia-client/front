@@ -65,7 +65,6 @@ export function ProcedureDialog({
       name: "",
       description: "",
       maxResponseDays: "0",
-      pqrsType: "",
     },
   });
 
@@ -75,7 +74,6 @@ export function ProcedureDialog({
         name: procedureToEdit.name,
         description: procedureToEdit.description,
         maxResponseDays: String(procedureToEdit.maxResponseDays),
-        pqrsType: procedureToEdit.pqrsType || "",
       });
     } else {
       form.reset();
@@ -88,7 +86,6 @@ export function ProcedureDialog({
         name: "",
         description: "",
         maxResponseDays: "0",
-        pqrsType: "",
       });
     }
   }, [open, procedureToEdit, form]);
@@ -174,23 +171,6 @@ export function ProcedureDialog({
                   <FormDescription>
                     Explica brevemente en qué consiste el procedimiento.
                   </FormDescription>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="pqrsType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Código PQRS</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ejemplo: PQRS-2024-001" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Ingresa el código identificador del procedimiento PQRS.
-                  </FormDescription>
-                  <FormMessage />
                 </FormItem>
               )}
             />

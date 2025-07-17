@@ -20,9 +20,6 @@ export async function getAreasByEntity(
       limit: limit ?? 10,
     };
   } catch (error) {
-    const err = error as AxiosError;
-    console.error("Error al obtener áreas:", err);
-
     return {
       areas: [],
       total: 0,
