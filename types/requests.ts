@@ -23,6 +23,7 @@ export interface DocumentItem {
 
 export interface AssignedRequestItem {
   id: string;
+  radicado: string;
   subject: string;
   status: RequestStatus;
   Document?: DocumentItem[];

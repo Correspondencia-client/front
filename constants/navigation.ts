@@ -24,7 +24,7 @@ export const routes = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Nueva solicitud",
+      title: "Crear solicitud",
       url: "/solicitudes/ciudadano/nueva-solicitud",
       icon: PlusCircle,
     },

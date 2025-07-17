@@ -35,10 +35,20 @@ export const citizenRequestFormSchema = z.object({
 });
 
 export const adminRequestFormSchema = z.object({
+  maxResponseDays: z
+    .string()
+    .min(1, "Este campo es obligatorio")
+    .refine(
+      (val) =>
+        !isNaN(Number(val)) && Number(val) > 0 && Number.isInteger(Number(val)),
+      {
+        message: "Debe ser un número entero mayor a 0",
+      }
+    ),
   requestType: z
-  .string()
-  .min(1, "Este campo es obligatorio.")
-  .max(100, "No puede exceder los 100 caracteres."),
+    .string()
+    .min(1, "Este campo es obligatorio.")
+    .max(100, "No puede exceder los 100 caracteres."),
   recipientEmail: z.email("Debe ser un correo válido."),
   recipientName: z
     .string()

@@ -38,6 +38,7 @@ import {
   MAX_FILE_SIZE_MB,
 } from "@/constants/files";
 import { useAuthStore } from "@/stores/auth-store";
+import { RequiredDot } from "@/components/common/required-dot";
 
 export function AdminNewRequestContent() {
   const { user } = useAuthStore();
@@ -49,6 +50,9 @@ export function AdminNewRequestContent() {
       description: "",
       recipientEmail: "",
       attachment: "",
+      maxResponseDays: "0",
+      recipientName: "",
+      requestType: "",
     },
   });
 
@@ -81,6 +85,13 @@ export function AdminNewRequestContent() {
   );
 
   const { isValid, isSubmitting } = form.formState;
+
+  const maxResponseDaysRaw = form.watch("maxResponseDays");
+
+  const isMaxResponseDaysValid = (() => {
+    const parsed = Number(maxResponseDaysRaw);
+    return !isNaN(parsed) && Number.isInteger(parsed) && parsed >= 0;
+  })();
 
   const onSubmit = async (values: AdminRequestFormValues) => {
     try {
@@ -121,7 +132,9 @@ export function AdminNewRequestContent() {
         <CardHeader>
           <CardTitle>Detalles de la solicitud</CardTitle>
           <CardDescription>
-            Resuma el objetivo de su solicitud en el título y utilice la descripción para explicar los detalles, antecedentes o requerimientos específicos.
+            Resuma el objetivo de su solicitud en el título y utilice la
+            descripción para explicar los detalles, antecedentes o
+            requerimientos específicos.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -132,7 +145,9 @@ export function AdminNewRequestContent() {
                 name="requestType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo o nombre de la solicitud</FormLabel>
+                    <FormLabel>
+                      Tipo o nombre de la solicitud <RequiredDot />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Por ejemplo: Petición, Queja, Reclamo, Solicitud de información..."
@@ -152,7 +167,9 @@ export function AdminNewRequestContent() {
                 name="recipientName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre del destinatario</FormLabel>
+                    <FormLabel>
+                      Nombre del destinatario <RequiredDot />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Nombre de la persona o empresa"
@@ -170,7 +187,9 @@ export function AdminNewRequestContent() {
                 name="recipientEmail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Correo electrónico del destinatario</FormLabel>
+                    <FormLabel>
+                      Correo electrónico del destinatario <RequiredDot />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
@@ -188,10 +207,32 @@ export function AdminNewRequestContent() {
 
               <FormField
                 control={form.control}
+                name="maxResponseDays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Máx. días de respuesta <RequiredDot />
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="number" min={0} {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Número máximo de días hábiles para dar respuesta al
+                      trámite.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Título de la Solicitud</FormLabel>
+                    <FormLabel>
+                      Título de la Solicitud <RequiredDot />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ingrese un título descriptivo para su solicitud"
@@ -212,7 +253,9 @@ export function AdminNewRequestContent() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descripción Detallada</FormLabel>
+                    <FormLabel>
+                      Descripción Detallada <RequiredDot />
+                    </FormLabel>
                     <FormControl>
                       <RichTextEditor
                         content={field.value}
@@ -410,7 +453,7 @@ export function AdminNewRequestContent() {
                   <Link href="/">Cancelar</Link>
                 </Button>
                 <div id="enviar-solicitud">
-                  <Button disabled={!isValid || isSubmitting}>
+                  <Button disabled={!isValid || isSubmitting || !isMaxResponseDaysValid}>
                     {isSubmitting ? (
                       <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />

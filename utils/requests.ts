@@ -77,6 +77,7 @@ export async function getMyRequests(
     const { data, page, total, limit } = response.data;
 
     const requests = data ?? [];
+    console.log("REQUEST: ", requests)
 
     console.log(requests);
 
