@@ -8,6 +8,21 @@ import { CredentialsSection } from "@/components/auth/register/credential-sectio
 import { Separator } from "@/components/ui/separator";
 import { SubmitButton } from "@/components/auth/register/submit-button";
 import { FormWrapper } from "@/components/auth/common/form-wrapper";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Regístrate Gratis",
+  description:
+    "Crea tu cuenta en Gestia en pocos pasos. Únete a la plataforma para simplificar la gestión de tus trámites y solicitudes de manera gratuita y segura.",
+  alternates: {
+    canonical: "/registrarse",
+  },
+  robots: {
+    index: false,
+    follow: true,
+    nocache: true,
+  },
+};
 
 export default function RegisterPage() {
   const { form, isSubmitting, isValid, onSubmit } = useSignupForm();
