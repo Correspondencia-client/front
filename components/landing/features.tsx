@@ -127,7 +127,7 @@ export function Features() {
       : featuresCardsListEntidades;
 
   return (
-    <Section container="default">
+    <Section id="caracteristicas" container="default">
       <Heading {...heading} />
       <div className="mb-8 flex gap-2">
         <button

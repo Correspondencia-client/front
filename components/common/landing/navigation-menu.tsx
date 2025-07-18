@@ -6,9 +6,9 @@ import Link from "next/link";
 import { ChevronDownIcon } from "lucide-react";
 
 interface NavLink {
-  title: string;
+  label: string;
   href: string;
-  sublinks?: { title: string; href: string }[];
+  sublinks?: { label: string; href: string }[];
 }
 
 interface Button {
@@ -59,13 +59,13 @@ export function DesktopMenu({
   );
 }
 
-function NavItem({ title, href, sublinks }: NavLink) {
+function NavItem({ label, href, sublinks }: NavLink) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   if (!sublinks || sublinks.length === 0) {
     return (
       <Link href={href} className={linkStyles}>
-        {title}
+        {label}
       </Link>
     );
   }
@@ -77,7 +77,7 @@ function NavItem({ title, href, sublinks }: NavLink) {
       onMouseLeave={() => setIsOpen(false)}
     >
       <Link href={href} className={clsx(linkStyles, "pr-2")}>
-        {title}
+        {label}
         <ChevronDownIcon className="h-4 w-4 text-gray-500" />
       </Link>
 
@@ -89,7 +89,7 @@ function NavItem({ title, href, sublinks }: NavLink) {
               href={sublink.href}
               className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              {sublink.title}
+              {sublink.label}
             </Link>
           ))}
         </div>
@@ -138,7 +138,7 @@ export function MobileMenu({
                   className="block py-2 text-gray-700 dark:text-gray-200 hover:text-blue-600"
                   onClick={() => setIsOpen(false)}
                 >
-                  {link.title}
+                  {link.label}
                 </Link>
                 {link.sublinks && (
                   <div className="ml-4 flex flex-col gap-1">
@@ -149,7 +149,7 @@ export function MobileMenu({
                         className="block py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600"
                         onClick={() => setIsOpen(false)}
                       >
-                        {sublink.title}
+                        {sublink.label}
                       </Link>
                     ))}
                   </div>

@@ -10,7 +10,7 @@ const actions = [
   },
   {
     _id: "2",
-    href: "/demo",
+     href: "https://wa.me/3223313923?text=Hola%2C%20quiero%20solicitar%20una%20demo%20de%20la%20plataforma",
     label: "Solicita una demo",
     type: "primary",
   },
@@ -18,7 +18,7 @@ const actions = [
 
 export function Hero() {
   return (
-    <section className="arial-font relative min-h-[calc(630px-var(--header-height))] overflow-hidden pb-10">
+    <section id="header" className="arial-font relative min-h-[calc(630px-var(--header-height))] overflow-hidden pb-10">
       <div className="absolute left-0 top-0 z-0 grid h-full w-full grid-cols-[clamp(28px,10vw,120px)_auto_clamp(28px,10vw,120px)] border-b">
         {/* Decorations */}
         <div className="col-span-1 flex h-full items-center justify-center" />

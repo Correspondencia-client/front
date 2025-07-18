@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Section } from "./section";
 
 export function CallToAction() {
@@ -16,25 +15,22 @@ export function CallToAction() {
           backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
         }}
       />
-      <div
-        className="w-full px-6 py-8 text-center z-[80]"
-        // className="w-full rounded-2xl border bg-[#f9fafb] px-6 py-8 text-center shadow-sm z-[110]"
-      >
-        <h2 className="mb-4 text-4xl text-[clamp(28px,7vw,36px)] font-semibold text-[--text-primary] dark:text-[--dark-text-primary]">
+      <div className="w-full px-6 py-8 text-center z-[80]">
+        <h2 className="text-primary mb-4 text-4xl text-[clamp(28px,7vw,36px)] font-semibold">
           Potencia tu gestión
         </h2>
         <p className="text-md max-w-2xl text-pretty text-center text-[#6b7280] dark:text-[--dark-text-tertiary] md:text-lg mx-auto">
           Optimiza procesos y mejora la atención ciudadana con herramientas
           digitales diseñadas para entidades públicas.
         </p>
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6 mt-6">
+        {/* <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6 mt-6">
           <Link
             href="/contacto-entidades"
             className="rounded-full bg-primary px-4 py-2 font-medium text-white shadow transition hover:bg-primary/90"
           >
             Solicitar información
           </Link>
-        </div>
+        </div> */}
       </div>
     </Section>
   );

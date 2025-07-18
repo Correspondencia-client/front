@@ -45,8 +45,7 @@ export const faqsItems = [
   },
   {
     question: "¿La plataforma tiene algún costo para los ciudadanos?",
-    answer:
-      "No, el uso de la plataforma para ciudadanos es gratuito.",
+    answer: "No, el uso de la plataforma para ciudadanos es gratuito.",
   },
 ];
 
@@ -67,6 +66,7 @@ function AccordionItem({
 
   return (
     <div
+      id="faqs"
       className="py-7 border-b cursor-pointer"
       onClick={() => setExpanded(isOpen ? false : index)}
     >

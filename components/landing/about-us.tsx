@@ -41,6 +41,7 @@ const featuresSideBySideList = {
 export function AboutUs() {
   return (
     <Section
+    id="sobre-la-plataforma"
       className="relative lg:container lg:mx-auto lg:!flex-row lg:gap-0 lg:p-28"
       container="full"
     >
