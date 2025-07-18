@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.arial-font {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -41,6 +45,55 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Tamaños de fuente personalizados */
+  --font-size-2xs: 11px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 3.75rem;
+  --font-size-7xl: 4.5rem;
+  --font-size-8xl: 6rem;
+  --font-size-9xl: 8rem;
+
+  /* Line heights personalizados */
+  --line-height-2xs: 1.3;
+  --line-height-xs: 1rem;
+  --line-height-sm: 1.25rem;
+  --line-height-base: 1.6;
+  --line-height-lg: 1.75rem;
+  --line-height-xl: 1.75rem;
+  --line-height-2xl: 2rem;
+  --line-height-3xl: 2.25rem;
+  --line-height-4xl: 2.5rem;
+
+  /* Letter spacing personalizado */
+  --letter-spacing-2xs: -0.3px;
+  --letter-spacing-xs: -0.36px;
+  --letter-spacing-sm: -0.42px;
+  --letter-spacing-base: -0.48px;
+  --letter-spacing-lg: -0.72px;
+  --letter-spacing-xl: -0.8px;
+  --letter-spacing-2xl: -1.04px;
+  --letter-spacing-3xl: -1.2px;
+  --letter-spacing-4xl: -1.44px;
+  --letter-spacing-5xl: -1.6px;
+  --letter-spacing-6xl: -1.8px;
+  --letter-spacing-7xl: -2px;
+  --letter-spacing-8xl: -2.4px;
+  --letter-spacing-9xl: -3.2px;
+  --letter-spacing-tighter: -0.58px;
+  --letter-spacing-tight: -0.48px;
+
+  /* Animaciones personalizadas */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
 }
 
 html,
@@ -50,6 +103,10 @@ body,
 }
 
 :root {
+  ::selection {
+    background-color: #bfdbfe;
+  }
+
   --radius: 0.65rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
@@ -82,6 +139,14 @@ body,
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.623 0.214 259.815);
+
+  text-rendering: geometricprecision;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --header-height: 64px;
 }
 
 .dark {
@@ -124,6 +189,133 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Clases de tipografía personalizadas */
+@layer utilities {
+  /* .text-2xs {
+    font-size: var(--font-size-2xs);
+    line-height: var(--line-height-2xs);
+    letter-spacing: var(--letter-spacing-2xs);
+    font-weight: 300;
+  }
+
+  .text-xs {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-xs);
+    letter-spacing: var(--letter-spacing-xs);
+    font-weight: 300;
+  }
+
+  .text-sm {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-sm);
+    letter-spacing: var(--letter-spacing-sm);
+  }
+
+  .text-base {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing-base);
+  }
+
+  .text-lg {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-lg);
+    letter-spacing: var(--letter-spacing-lg);
+  }
+
+  .text-xl {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-xl);
+    letter-spacing: var(--letter-spacing-xl);
+  }
+
+  .text-2xl {
+    font-size: var(--font-size-2xl);
+    line-height: var(--line-height-2xl);
+    letter-spacing: var(--letter-spacing-2xl);
+  }
+
+  .text-3xl {
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-3xl);
+    letter-spacing: var(--letter-spacing-3xl);
+  }
+
+  .text-4xl {
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-4xl);
+    letter-spacing: var(--letter-spacing-4xl);
+  }
+
+  .text-5xl {
+    font-size: var(--font-size-5xl);
+    letter-spacing: var(--letter-spacing-5xl);
+  }
+
+  .text-6xl {
+    font-size: var(--font-size-6xl);
+    letter-spacing: var(--letter-spacing-6xl);
+  }
+
+  .text-7xl {
+    font-size: var(--font-size-7xl);
+    letter-spacing: var(--letter-spacing-7xl);
+  }
+
+  .text-8xl {
+    font-size: var(--font-size-8xl);
+    letter-spacing: var(--letter-spacing-8xl);
+  }
+
+  .text-9xl {
+    font-size: var(--font-size-9xl);
+    letter-spacing: var(--letter-spacing-9xl);
+  }
+
+  .tracking-tighter {
+    letter-spacing: var(--letter-spacing-tighter);
+  }
+
+  .tracking-tight {
+    letter-spacing: var(--letter-spacing-tight);
+  }
+
+  .animate-accordion-down {
+    animation: var(--animate-accordion-down);
+  }
+
+  .animate-accordion-up {
+    animation: var(--animate-accordion-up);
+  }
+
+  .font-sans {
+    font-family: "Geist", sans-serif;
+  }
+
+  .font-serif {
+    font-family: "IBM Plex Serif", serif;
+  } */
+}
+
+/* Keyframes para las animaciones */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
   }
 }
 
@@ -174,4 +366,13 @@ body,
 
 .ProseMirror h3 {
   font-size: 1.125rem;
+}
+
+/* Estilos de tipografía para prose */
+.prose p {
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.prose code {
+  letter-spacing: normal;
 }

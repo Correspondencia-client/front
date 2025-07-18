@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://apico.eduadminsoft.shop/api/:path*",
+        destination: "https://api.gestia.com.co/api/:path*",
       },
     ];
   },

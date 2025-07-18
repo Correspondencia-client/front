@@ -4,16 +4,32 @@ import "./globals.css";
 
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { SocketProvider } from "@/components/context/socket-context";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geist = Geist({
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  fallback: [
+    "Inter",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    "sans-serif",
+  ],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
+  fallback: ["monaco", "monospace"],
 });
 
 export const metadata: Metadata = {
@@ -29,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geist.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
           {/* <SocketProvider
