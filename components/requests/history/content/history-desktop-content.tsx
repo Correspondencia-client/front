@@ -17,8 +17,6 @@ export function HistoryDesktopContent() {
           type="Desktop"
           key={selectedHistoryItem.id}
           item={selectedHistoryItem}
-          isExpanded={true}
-          onToggle={() => {}}
         />
       ) : (
         <RequestHistoryItemSkeleton isMyResponse={false} />
