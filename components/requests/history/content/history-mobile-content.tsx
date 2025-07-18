@@ -19,14 +19,6 @@ export default function HistoryMobileContent({
   const { data: history = [], isLoading: isLoadingHisotry } =
     useRequestHistory(requestId);
 
-  const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
-    null
-  );
-
-  const toggleRequest = (id: string) => {
-    setExpandedRequestId((prevId) => (prevId === id ? null : id));
-  };
-
   return (
     <>
       {isReplyModalOpen && (
@@ -84,8 +76,6 @@ export default function HistoryMobileContent({
                 type="Mobile"
                 key={item.id}
                 item={item}
-                isExpanded={expandedRequestId === item.id}
-                onToggle={() => toggleRequest(item.id)}
               />
             ))}
           </div>

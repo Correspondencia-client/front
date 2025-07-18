@@ -195,7 +195,7 @@ export function CitizenRequestContent() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Título de la Solicitud</FormLabel>
+                    <FormLabel>Título de la solicitud</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ingrese un título descriptivo para su solicitud"
@@ -216,7 +216,7 @@ export function CitizenRequestContent() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descripción Detallada</FormLabel>
+                    <FormLabel>Descripción detallada</FormLabel>
                     <FormControl>
                       <RichTextEditor
                         content={field.value}
@@ -238,7 +238,7 @@ export function CitizenRequestContent() {
                 name="attachment"
                 render={({ field: { value, onChange, ...fieldProps } }) => (
                   <FormItem>
-                    <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
+                    <FormLabel>Adjuntar archivos (Opcional)</FormLabel>
                     <FormControl>
                       <div className="flex flex-col gap-2">
                         <label

@@ -27,7 +27,7 @@ export function HistoryItem({ history }: HistoryItemProps) {
       "bg-card hover:bg-muted": !isSelected,
       "border-blue-200 bg-blue-50 hover:bg-blue-100":
         isMyResponse && !isSelected,
-      hidden: history.message === "Solicitud asignada automáticamente.",
+      hidden: history.message.toLowerCase() === "solicitud asignada al funcionario.",
     }
   );
 

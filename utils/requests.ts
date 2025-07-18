@@ -145,7 +145,6 @@ export const getRequestHistory = async (
   requestId: string
 ): Promise<RequestHistoryItem[]> => {
   const response = await api.get(`/requests/${requestId}/history`);
-  console.log("HISTORY RESPONSE", response.data);
   return response.data;
 };
 

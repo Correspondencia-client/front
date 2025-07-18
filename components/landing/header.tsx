@@ -36,7 +36,7 @@ export const Header = () => {
   return (
     <header className="arial-font sticky left-0 top-0 z-[110] flex w-full flex-col border-b bg-background">
       <div className="flex h-[64px] bg-background">
-        <div className="container mx-auto grid grid-cols-[1fr_max-content_1fr] place-items-center content-center items-center px-6">
+        <div className="container mx-auto flex items-center justify-between lg:grid lg:grid-cols-[1fr_max-content_1fr] place-items-center content-center px-6">
           <Link href="#header">
             <Logo column={false} showName />
           </Link>

@@ -42,7 +42,7 @@ export function RequestsStatusCard({
           </div>
           <div className="flex justify-between items-center w-full">
             <p className={cn("text-sm font-medium")}>{title}</p>
-            <p className="text-2xl font-bold">{count}</p>
+            <p className="text-lg sm:text-2xl font-bold">{count}</p>
           </div>
         </div>
       </CardContent>

@@ -88,7 +88,7 @@ export function CitizenPanelContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between space-y-2">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
         <div className="space-y-2">
           <h2 className="text-3xl font-bold tracking-tight text-gray-700">
             Bienvenido,{" "}
@@ -101,7 +101,7 @@ export function CitizenPanelContent() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button asChild>
+          <Button asChild className="max-md:w-full">
             <Link href="/solicitudes/ciudadano/nueva-solicitud">
               <PlusCircle className="mr-2 h-4 w-4" />
               Nueva solicitud
@@ -111,7 +111,7 @@ export function CitizenPanelContent() {
       </div>
 
       {/* Gráfica de Estado de Solicitudes */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {isLoadingCounts || isLoadingOfficerCounts ? (
           <SimpleChartSkeleton />
         ) : isEmptyChart ? (

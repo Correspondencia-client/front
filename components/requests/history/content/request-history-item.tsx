@@ -16,21 +16,18 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface RequestHistoryItemProps {
   type: "Desktop" | "Mobile";
-  isExpanded: boolean;
   item: RequestHistoryItemType;
-  onToggle: () => void;
 }
 
 export function RequestHistoryItem({
   type,
   item,
-  isExpanded,
-  onToggle,
-}: RequestHistoryItemProps) {
+}:
+RequestHistoryItemProps) {
   const { user } = useAuthStore();
   const isMyResponse = item?.updatedBy?.email === user?.email;
 
@@ -42,9 +39,8 @@ export function RequestHistoryItem({
     <Card
       className={cn(
         "relative overflow-hidden max-sm:py-10 border gap-4",
-        item.message === "Solicitud asignada automáticamente." && "hidden"
+        item.message === "Solicitud Asignada al Funcionario." && "hidden"
       )}
-      onClick={onToggle}
     >
       {isMyResponse && (
         <Badge className="absolute top-2 right-2 bg-blue-500 text-white">
@@ -132,57 +128,53 @@ export function RequestHistoryItem({
           </div>
         )}
 
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              key="expand"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className={cn(
-                "overflow-hidden mt-4 space-y-4",
-                type === "Mobile" ? "block" : "hidden"
-              )}
-            >
-              {item.data?.texto && (
-                <div>
-                  <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-orange-600" />
-                    Detalles:
-                  </h4>
-                  <div
-                    className="prose prose-sm max-w-none border border-dashed border-muted-foreground bg-muted p-4 rounded-md"
-                    dangerouslySetInnerHTML={{ __html: item.data.texto }}
-                  />
-                </div>
-              )}
-
-              {getDocuments(item).length > 0 && (
-                <div className={cn("mt-4")}>
-                  <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
-                    <Paperclip className="h-4 w-4 text-gray-600" />
-                    Documentos Adjuntos:
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {getDocuments(item).map((doc) => (
-                      <a
-                        href={doc.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        key={doc.id}
-                        className="flex items-center gap-2 p-2 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-sm"
-                      >
-                        <Download className="h-4 w-4 text-blue-600" />
-                        <span className="flex-1 truncate">{doc.name}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
+        <motion.div
+          key="expand"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className={cn(
+            "overflow-hidden mt-4 space-y-4",
+            type === "Mobile" ? "block" : "hidden"
           )}
-        </AnimatePresence>
+        >
+          {item.data?.texto && (
+            <div>
+              <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-orange-600" />
+                Detalles:
+              </h4>
+              <div
+                className="prose prose-sm max-w-none border border-dashed border-muted-foreground bg-muted p-4 rounded-md"
+                dangerouslySetInnerHTML={{ __html: item.data.texto }}
+              />
+            </div>
+          )}
+
+          {getDocuments(item).length > 0 && (
+            <div className={cn("mt-4")}>
+              <h4 className="font-semibold text-base mb-2 flex items-center gap-2">
+                <Paperclip className="h-4 w-4 text-gray-600" />
+                Documentos Adjuntos:
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {getDocuments(item).map((doc) => (
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    key={doc.id}
+                    className="flex items-center gap-2 p-2 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-sm"
+                  >
+                    <Download className="h-4 w-4 text-blue-600" />
+                    <span className="flex-1 truncate">{doc.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
 
         {item.type === "TRANSFERRED" && (
           <div className="mt-4">

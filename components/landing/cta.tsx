@@ -20,17 +20,9 @@ export function CallToAction() {
           Potencia tu gestión
         </h2>
         <p className="text-md max-w-2xl text-pretty text-center text-[#6b7280] dark:text-[--dark-text-tertiary] md:text-lg mx-auto">
-          Optimiza procesos y mejora la atención ciudadana con herramientas
-          digitales diseñadas para entidades públicas.
+          Agiliza la gestión de trámites y mejora la experiencia de tus usuarios
+          con soluciones digitales intuitivas y seguras.
         </p>
-        {/* <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6 mt-6">
-          <Link
-            href="/contacto-entidades"
-            className="rounded-full bg-primary px-4 py-2 font-medium text-white shadow transition hover:bg-primary/90"
-          >
-            Solicitar información
-          </Link>
-        </div> */}
       </div>
     </Section>
   );

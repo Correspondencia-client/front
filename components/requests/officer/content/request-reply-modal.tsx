@@ -172,11 +172,14 @@ export function RequestReplyModal({
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Responder a la solicitud{" "}
-            {/* <span className="text-primary">{request.procedure.name}</span> */}
+            {user?.role === "CITIZEN"
+              ? "Comunícate con el funcionario"
+              : "Responder a la solicitud"}
           </DialogTitle>
           <DialogDescription>
-            Redacta tu respuesta para la solicitud seleccionada.
+            {user?.role === "CITIZEN"
+              ? "Escribe tu respuesta o comentarios para avanzar con el trámite de tu solicitud."
+              : "Redacta tu respuesta para la solicitud seleccionada."}
           </DialogDescription>
         </DialogHeader>
 
@@ -190,7 +193,7 @@ export function RequestReplyModal({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título de la Respuesta</FormLabel>
+                  <FormLabel>Asunto</FormLabel>
                   <FormControl>
                     <Input placeholder="Asunto de tu respuesta" {...field} />
                   </FormControl>
@@ -242,12 +245,12 @@ export function RequestReplyModal({
                 {isGeneratingAI ? (
                   <>
                     <Loader className="animate-spin" />
-                    Generando...
+                    Generando descripción...
                   </>
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Generar con IA
+                    Generar descripción con IA
                   </>
                 )}
               </Button>
@@ -258,7 +261,7 @@ export function RequestReplyModal({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contenido de la Respuesta</FormLabel>
+                  <FormLabel>Descripción detallada</FormLabel>
                   <FormControl>
                     <RichTextEditor
                       content={field.value}
@@ -280,7 +283,7 @@ export function RequestReplyModal({
               name="attachment"
               render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
-                  <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
+                  <FormLabel>Adjuntar archivos (Opcional)</FormLabel>
                   <FormControl>
                     <div className="flex flex-col gap-2">
                       <label
@@ -354,45 +357,8 @@ export function RequestReplyModal({
                           id="attachment-upload"
                           type="file"
                           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                          multiple // Permitir múltiples archivos
+                          multiple 
                           className="hidden"
-                          // onChange={(event) => {
-                          //   const files = event.target.files;
-                          //   if (files && files.length > 0) {
-                          //     // Combinar los archivos nuevos con los existentes
-                          //     const newFilesArray = Array.from(files);
-                          //     const combinedFiles = [
-                          //       ...selectedFiles,
-                          //       ...newFilesArray,
-                          //     ];
-
-                          //     // Eliminar duplicados si es necesario (por nombre y tamaño)
-                          //     const uniqueCombinedFiles =
-                          //       combinedFiles.filter(
-                          //         (file, index, self) =>
-                          //           index ===
-                          //           self.findIndex(
-                          //             (f) =>
-                          //               f.name === file.name &&
-                          //               f.size === file.size
-                          //           )
-                          //       );
-
-                          //     setSelectedFiles(uniqueCombinedFiles);
-
-                          //     // Crear un nuevo FileList para react-hook-form
-                          //     const dataTransfer = new DataTransfer();
-                          //     uniqueCombinedFiles.forEach((file) =>
-                          //       dataTransfer.items.add(file)
-                          //     );
-                          //     onChange(dataTransfer.files);
-                          //   } else if (selectedFiles.length === 0) {
-                          //     // Si no se seleccionó nada y no había archivos, limpiar
-                          //     onChange(undefined);
-                          //     setSelectedFiles([]);
-                          //   }
-                          //   // Si se cancela la selección pero ya había archivos, no hacer nada
-                          // }}
                           onChange={(event) => {
                             const files = event.target.files;
                             const rejectedFiles: string[] = [];
