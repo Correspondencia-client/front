@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   // Es una buena práctica definir la URL base en tus variables de entorno
   // para que funcione tanto en desarrollo como en producción.
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://gestia.com.co/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://gestia.com.co";
 
   return [
     {
