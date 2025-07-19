@@ -70,7 +70,7 @@ async function refreshTokenServer(request: NextRequest) {
   try {
     const apiUrl =
       process.env.BACKEND_PUBLIC_API_URL || "https://api.gestia.com.co";
-    const res = await fetch(`${apiUrl}/auth/refresh`, {
+    const res = await fetch(`${apiUrl}/api/auth/refresh`, {
       method: "GET",
       headers: {
         Cookie: request.headers.get("cookie") || "",
@@ -122,6 +122,11 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some((route) =>
     pathname.startsWith(route)
   );
+
+  // Si es ruta pública y NO hay token, dejar pasar
+  if (isPublicRoute && !accessToken) {
+    return NextResponse.next();
+  }
 
   if (isPublicRoute && accessToken) {
     const payload = accessToken ? await verifyAccessToken(accessToken) : null;

@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://api.gestia.com.co/api/:path*",
+        destination: "http://localhost:3001/api/:path*",
+        // destination: "https://api.gestia.com.co/api/:path*",
       },
     ];
   },
