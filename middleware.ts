@@ -66,6 +66,34 @@ async function verifyAccessToken(token: string) {
   }
 }
 
+async function refreshTokenServer(request: NextRequest) {
+  try {
+    const apiUrl =
+      process.env.BACKEND_PUBLIC_API_URL || "https://api.gestia.com.co";
+    const res = await fetch(`${apiUrl}/auth/refresh`, {
+      method: "GET",
+      headers: {
+        Cookie: request.headers.get("cookie") || "",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) return { success: false };
+
+    const setCookieHeader = res.headers.get("set-cookie");
+    const data = await res.json();
+
+    return {
+      success: true,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      setCookieHeader,
+    };
+  } catch {
+    return { success: false };
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -78,7 +106,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("accessToken")?.value;
+  const { accessToken, refreshToken } = {
+    accessToken: request.cookies.get("accessToken")?.value,
+    refreshToken: request.cookies.get("refreshToken")?.value,
+  };
 
   // Logs temporales para depuración
   console.log(`🔍 Middleware - Ruta: ${pathname}`);
@@ -92,14 +123,12 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  if (isPublicRoute) {
-    // Si está en ruta pública pero tiene token válido, redirigir a panel
-    if (accessToken) {
-      const payload = await verifyAccessToken(accessToken);
-      if (payload?.role) {
-        return NextResponse.redirect(new URL("/panel", request.url));
-      }
+  if (isPublicRoute && accessToken) {
+    const payload = accessToken ? await verifyAccessToken(accessToken) : null;
+    if (payload?.role) {
+      return NextResponse.redirect(new URL("/panel", request.url));
     }
+
     return NextResponse.next();
   }
 
@@ -117,17 +146,27 @@ export async function middleware(request: NextRequest) {
   );
 
   // Si no es ruta privada, permitir acceso
-  if (!isPrivateRoute) {
-    return NextResponse.next();
-  }
+  if (isPrivateRoute) {
+    if (!accessToken && refreshToken) {
+      const refreshResult = await refreshTokenServer(request);
+      if (refreshResult.success && refreshResult.setCookieHeader) {
+        const response = NextResponse.next();
+        response.headers.set("set-cookie", refreshResult.setCookieHeader);
+        return response;
+      } else {
+        const response = NextResponse.redirect(new URL("/iniciar-sesion", request.url));
+        response.cookies.delete("accessToken");
+        response.cookies.delete("refreshToken");
+        return response;
+      }
+    }
 
-  // Verificar token para rutas privadas
-  if (!accessToken) {
-    return NextResponse.redirect(new URL("/iniciar-sesion", request.url));
+    if (!accessToken && !refreshToken) {
+      return NextResponse.redirect(new URL("/iniciar-sesion", request.url));
+    }
   }
-
   // Verificar y validar el token
-  const payload = await verifyAccessToken(accessToken);
+  const payload = accessToken ? await verifyAccessToken(accessToken) : null;
   const role = payload?.role as string | undefined;
 
   console.log(`🔍 Payload válido: ${!!payload}`);
