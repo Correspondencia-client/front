@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     canonical: "/iniciar-sesion",
   },
   robots: {
-    index: false,
+    index: true,
     follow: true, // Permite que los bots sigan otros enlaces (ej. "olvidé mi contraseña")
     nocache: true,
   },
