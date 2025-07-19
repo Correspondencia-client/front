@@ -116,3 +116,40 @@ export interface AssignAreaPayload {
   toAreaId: string;
   message: string;
 }
+
+export type ExternalRequest = {
+  id: string;
+  radicado: string;
+  typeRequest: string;
+  recipient: string;
+  mailrecipient: string;
+  maxResponseDays: number;
+  subject: string;
+  content: {
+    texto: string;
+  };
+  status: RequestStatus; // Puedes ajustar los estados válidos
+  entityId: string;
+  userId: string;
+  deadline: string; // o Date si lo conviertes
+  createdAt: string; // o Date
+  updatedAt: string; // o Date
+};
+
+export type ExternalRequestsResponse = {
+  requests: ExternalRequest[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type ApiExternalRequestsResponse = {
+  data: ExternalRequest[];
+  meta: {
+    totalItems: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+};

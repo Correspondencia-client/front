@@ -1,8 +1,8 @@
 "use client";
 
-import { useMyRequests } from "@/hooks/use-requests";
+import { useMyExternalRequests, useMyRequests } from "@/hooks/use-requests";
 import React, { useState } from "react";
-import { AssignedRequestItem } from "@/types/requests";
+import { AssignedRequestItem, ExternalRequest } from "@/types/requests";
 import { useRequestStatusStore } from "@/stores/request-status";
 import {
   Card,
@@ -17,6 +17,14 @@ import { SearchInput } from "@/components/common/search-input";
 import { DataTable } from "@/components/ui/data-table";
 import { MyExternalRequestColumns } from "../table/my-external-requests-columns";
 import { MyExternalRequestTableSkeleton } from "../skeletons/my-external-request-table-skeleton";
+import { request } from "http";
+import api from "@/lib/axios";
+import { CompleteRequestDialog } from "./completed-request-dialog";
+import { CompleteExternalRequestDialog } from "./complete-external-request-dialog";
+import { ExternalRequestDetailModal } from "./external-request-detail-modal";
+import { useQueryClient } from "@tanstack/react-query";
+import { MY_REQUESTS_EXTERNAL_QUERY_KEY } from "@/constants/queries";
+import { toast } from "sonner";
 
 interface MyRequestFilters {
   search: string;
@@ -25,14 +33,19 @@ interface MyRequestFilters {
 }
 
 export function MyExternalRequestsContent() {
+  const queryClient = useQueryClient();
   const { status } = useRequestStatusStore();
+
+  // Estado para el modal de completada de solicitud
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [isLoadingCompleted, setIsLoadingCompleted] = useState(false);
 
   // Estado para el modal de detalle de solicitud
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Estado para la solicitud seleccionada
   const [selectedRequest, setSelectedRequest] =
-    useState<AssignedRequestItem | null>(null);
+    useState<ExternalRequest | null>(null);
 
   // Filtros para la tabla de solicitudes
   const [filters, setFilters] = useState<MyRequestFilters>({
@@ -49,21 +62,60 @@ export function MyExternalRequestsContent() {
     }));
   };
 
-  const { data: requestData, isLoading: isLoadingRequests } = useMyRequests({
-    status: status || "PENDING",
-    page: filters.page,
-    limit: filters.limit,
-  });
+  const { data: requestData, isLoading: isLoadingRequests } =
+    useMyExternalRequests({
+      status: status || "PENDING",
+      page: filters.page,
+      limit: filters.limit,
+    });
 
-  const handleViewRequest = (request: AssignedRequestItem) => {
+  const handleMarkAsCompleted = async (request: ExternalRequest) => {
+    try {
+      setIsLoadingCompleted(true);
+      await api.patch(`/request-external/${request.id}/status`);
+      queryClient.invalidateQueries({
+        queryKey: [MY_REQUESTS_EXTERNAL_QUERY_KEY],
+        exact: false,
+      });
+      toast.success("Solicitud marcada como completada correctamente.");
+    } catch (error) {
+      toast.error("Error al completar la solicitud.");
+    } finally {
+      setIsLoadingCompleted(false);
+    }
+  };
+
+  const handleOpenCompleteModal = (request: ExternalRequest) => {
+    setSelectedRequest(request);
+    setIsCompleteModalOpen(true);
+  };
+
+  const handleViewRequest = (request: ExternalRequest) => {
     setSelectedRequest(request);
     setIsDetailModalOpen(true);
   };
 
-  const columns = MyExternalRequestColumns(handleViewRequest);
+  const columns = MyExternalRequestColumns(
+    handleViewRequest,
+    handleOpenCompleteModal
+  );
 
   return (
     <div className="space-y-6">
+      <CompleteExternalRequestDialog
+        isLoading={isLoadingCompleted}
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        request={selectedRequest}
+        onConfirm={handleMarkAsCompleted}
+      />
+
+      <ExternalRequestDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        request={selectedRequest}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl font-bold tracking-tight">

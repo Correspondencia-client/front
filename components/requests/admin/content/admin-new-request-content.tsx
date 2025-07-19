@@ -39,6 +39,7 @@ import {
 } from "@/constants/files";
 import { useAuthStore } from "@/stores/auth-store";
 import { RequiredDot } from "@/components/common/required-dot";
+import { createExternalRequest } from "@/utils/requests";
 
 export function AdminNewRequestContent() {
   const { user } = useAuthStore();
@@ -95,7 +96,7 @@ export function AdminNewRequestContent() {
 
   const onSubmit = async (values: AdminRequestFormValues) => {
     try {
-      // await createCitizenRequest(values);
+      await createExternalRequest(values, user?.entity?.id ?? "");
       toast.success("Solicitud enviada correctamente");
       form.reset();
       setSelectedFiles([]); // Limpiar los archivos seleccionados
@@ -453,7 +454,11 @@ export function AdminNewRequestContent() {
                   <Link href="/">Cancelar</Link>
                 </Button>
                 <div id="enviar-solicitud">
-                  <Button disabled={!isValid || isSubmitting || !isMaxResponseDaysValid}>
+                  <Button
+                    disabled={
+                      !isValid || isSubmitting || !isMaxResponseDaysValid
+                    }
+                  >
                     {isSubmitting ? (
                       <>
                         <Loader className="mr-2 h-4 w-4 animate-spin" />

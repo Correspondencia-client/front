@@ -1,13 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { AssignedRequestItem } from "@/types/requests";
+import { ExternalRequest } from "@/types/requests";
 import { Button } from "@/components/ui/button";
-import { Eye, Clock } from "lucide-react";
-import { formatDistanceToNowStrict, format } from "date-fns";
+import { CheckCircle2, Clock, Eye } from "lucide-react";
+import { differenceInCalendarDays, format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export function MyExternalRequestColumns(
-  onView: (request: AssignedRequestItem) => void
-): ColumnDef<AssignedRequestItem>[] {
+  onView: (request: ExternalRequest) => void,
+  onComplete: (request: ExternalRequest) => void
+): ColumnDef<ExternalRequest>[] {
   return [
     {
       accessorKey: "radicado",
@@ -32,7 +33,7 @@ export function MyExternalRequestColumns(
       header: "Destinatario",
       cell: ({ row }) => (
         <div className="text-sm text-gray-700">
-          {row.original.currentArea?.name || "Área no disponible"}
+          {row.original.recipient || "-"}
         </div>
       ),
     },
@@ -48,39 +49,48 @@ export function MyExternalRequestColumns(
         );
       },
     },
-    // {
-    //   accessorKey: "deadline",
-    //   header: "Días para responder",
-    //   cell: ({ row }) => {
-    //     const deadline = new Date(row.original.deadline);
-    //     const now = new Date();
+    {
+      accessorKey: "deadline",
+      header: "Días restantes",
+      cell: ({ row }) => {
+        const deadline = new Date(row.original.deadline);
+        const today = new Date();
+        const daysLeft = differenceInCalendarDays(deadline, today);
 
-    //     const diffText = formatDistanceToNowStrict(deadline, {
-    //       locale: es,
-    //       addSuffix: false,
-    //     });
-
-    //     return (
-    //       <div className="text-sm text-gray-600 flex items-center gap-1">
-    //         <Clock className="w-4 h-4 text-muted-foreground" />
-    //         {diffText}
-    //       </div>
-    //     );
-    //   },
-    // },
+        return (
+          <div className="text-sm text-gray-700 flex items-center gap-1">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            {daysLeft > 0
+              ? `${daysLeft} día${daysLeft !== 1 ? "s" : ""}`
+              : "Vencida"}
+          </div>
+        );
+      },
+    },
     {
       id: "actions",
       header: "Acción",
       cell: ({ row }) => (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onView(row.original)}
-          className="text-sm"
-        >
-          <Eye className="w-4 h-4 mr-2" />
-          Ver solicitud
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onView(row.original)}
+            className="text-sm"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Ver
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => onComplete(row.original)}
+            className="text-sm"
+          >
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            Completar
+          </Button>
+        </div>
       ),
     },
   ];
