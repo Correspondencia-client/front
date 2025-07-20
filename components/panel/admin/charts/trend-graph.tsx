@@ -7,11 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { subDays, format } from "date-fns";
-import { es } from "date-fns/locale";
+import { useRequestsTrend } from "@/hooks/use-analytics";
 import { LineChartIcon } from "lucide-react";
-import React, { useMemo, useState } from "react";
-import { DateRange } from "react-day-picker";
 import {
   CartesianGrid,
   Line,
@@ -21,22 +18,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-const trendData = Array.from({ length: 30 }, (_, i) => {
-  const date = subDays(new Date(), 29 - i);
-  return {
-    date: format(date, "MMM dd", { locale: es }),
-    requests: Math.floor(Math.random() * 50) + 10, // 10-60 solicitudes por día
-  };
-});
+import { TrendGrapgSkeleton } from "../skeletons/trend-grapg-skeleton";
 
 export function TrendGraph() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date(),
-  });
+  const { data, isLoading } = useRequestsTrend();
 
-  const filteredTrendData = useMemo(() => trendData, [dateRange]);
+  const trendData = data ?? [];
+
+  if (isLoading) {
+    return <TrendGrapgSkeleton />;
+  }
 
   return (
     <Card>
@@ -52,7 +43,7 @@ export function TrendGraph() {
       <CardContent>
         <ResponsiveContainer width="100%" height={350}>
           <LineChart
-            data={filteredTrendData}
+            data={trendData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />

@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { BarChartIcon } from "lucide-react";
 import { chartConfig } from "@/components/panel/admin/officer-panel-content";
+import { useAreaVolumeData } from "@/hooks/use-analytics";
+import { AreaVolumeChartSkeleton } from "../skeletons/area-volume-chart-skeleton";
 
 // Paleta de colores azules para usar dinámicamente
 const blueColorPalette = [
@@ -45,7 +47,15 @@ const rawApiData = [
 ];
 
 export function AreaVolumeChart() {
-  const areaVolumeData = assignColorsToData(rawApiData);
+  // const areaVolumeData = assignColorsToData(rawApiData);
+
+  const { data, isLoading, isError } = useAreaVolumeData();
+
+  if (isLoading) {
+    return <AreaVolumeChartSkeleton />;
+  }
+
+  const areaVolumeData = assignColorsToData(data ?? []);
 
   return (
     <Card className="lg:col-span-2">
@@ -77,7 +87,7 @@ export function AreaVolumeChart() {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="requests" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="requests" radius={[10, 10, 0, 0]} />
           </BarChart>
         </ChartContainer>
       </CardContent>

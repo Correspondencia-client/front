@@ -37,7 +37,7 @@ import { userFormSchema, UserFormValues } from "@/schemas/user";
 import { Loader } from "lucide-react";
 import { RequiredDot } from "@/components/common/required-dot";
 import { userRoles } from "@/constants/user";
-import { USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
+import { KPI_QUERY_KEY, USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
 import { useEntitySelection } from "@/stores/entity-selection";
 import { AxiosError } from "axios";
 import { useAuthStore } from "@/stores/auth-store";
@@ -58,7 +58,7 @@ export function UserDialog({
   const queryClient = useQueryClient();
   const isEditMode = !!userToEdit;
 
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
   const { selectedEntity } = useEntitySelection();
 
   const form = useForm<UserFormValues>({
@@ -105,6 +105,7 @@ export function UserDialog({
       } else {
         await createUser(data, selectedEntity!.id);
         toast.success("Usuario creado correctamente");
+        queryClient.invalidateQueries({ queryKey: [KPI_QUERY_KEY] });
       }
 
       onOpenChange(false);
@@ -173,44 +174,44 @@ export function UserDialog({
               )}
             />
 
-            {user?.role === "SUPER" && <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Rol <RequiredDot />
-                  </FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un rol" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {userRoles.map(({ value, label }, i) => (
-                        <SelectItem key={i} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                  <FormDescription>
-                    Define el nivel de acceso y permisos del usuario.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />}
+            {user?.role === "SUPER" && (
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Rol <RequiredDot />
+                    </FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona un rol" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {userRoles.map(({ value, label }, i) => (
+                          <SelectItem key={i} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    <FormDescription>
+                      Define el nivel de acceso y permisos del usuario.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
               name="areaId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Área
-                  </FormLabel>
+                  <FormLabel>Área</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>

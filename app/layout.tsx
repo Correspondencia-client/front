@@ -58,12 +58,12 @@ export const metadata: Metadata = {
       "Modernizando la gestión de trámites entre entidades y ciudadanos.",
     url: baseUrl,
     siteName: "Gestia",
-    // images: [
-    //   {
-    //     url: "/icons/logo.svg",
-    //     alt: "Plataforma Gestia para la gestión de trámites",
-    //   },
-    // ],
+    images: [
+      {
+        url: "/icons/logo.svg",
+        alt: "Plataforma Gestia para la gestión de trámites",
+      },
+    ],
     locale: "es_CO",
     type: "website",
   },
@@ -72,10 +72,12 @@ export const metadata: Metadata = {
     title: "Gestia - Gestión Inteligente de Trámites y Solicitudes",
     description:
       "Modernizando la gestión de trámites entre entidades y ciudadanos.",
-    // images: ["/icons/logo.svg"],
+    images: ["/icons/logo.svg"],
   },
   icons: {
-    icon: "/icons/logo.svg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
@@ -93,7 +95,7 @@ export default function RootLayout({
               process.env.NEXT_PUBLIC_SOCKET_URL || "https://gestia.com.co"
             }
           > */}
-            {children}
+          {children}
           {/* </SocketProvider> */}
           <Toaster richColors />
         </QueryProvider>

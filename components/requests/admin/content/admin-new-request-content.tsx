@@ -101,6 +101,7 @@ export function AdminNewRequestContent() {
       form.reset();
       setSelectedFiles([]); // Limpiar los archivos seleccionados
     } catch (error) {
+      console.log(error)
       const err = error as AxiosError<{ message?: string }>;
 
       toast.error(

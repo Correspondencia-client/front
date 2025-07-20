@@ -33,9 +33,12 @@ import { replyToRequest } from "@/utils/requests";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  KPI_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
+  RECENT_ACTIVITY_QUERY_KEY,
   REQUEST_HISTORY_QUERY_KEY,
+  STATUS_PIE_CHART_QUERY_KEY,
 } from "@/constants/queries";
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
@@ -77,8 +80,6 @@ export function RequestReplyModal({
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
   const handleGenerateWithIA = async () => {
-    console.log("ENTRANDO A GENERAR CON IA");
-
     const prompt = form.getValues("aiPrompt");
 
     if (!prompt) {
@@ -94,25 +95,15 @@ export function RequestReplyModal({
 
       const res = await api.post(`/ia/${requestId}`);
 
-      console.log(res);
-
       const { data } = res;
       if (res.status !== 201) throw new Error(data.error || "Error al generar");
 
       let html = data.text?.trim() || "";
 
-      // if (html.startsWith("```html")) {
-      //   html = html
-      //     .replace(/^```html
-      //     .replace(/```$/, "")
-      //     .trim();
-      // }
-
       form.setValue("description", html, { shouldValidate: true });
       form.setValue("aiPrompt", "");
       toast.success("Texto generado con IA.");
     } catch (err) {
-      console.log(err as AxiosError);
       toast.error("Error al generar texto.");
     } finally {
       setIsGeneratingAI(false);
@@ -157,6 +148,9 @@ export function RequestReplyModal({
         queryKey: [REQUEST_HISTORY_QUERY_KEY],
         exact: false,
       });
+      queryClient.invalidateQueries({ queryKey: [KPI_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [STATUS_PIE_CHART_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [RECENT_ACTIVITY_QUERY_KEY] });
       toast.success("Respuesta enviada con éxito!");
       form.reset();
       setSelectedFiles([]);
@@ -357,7 +351,7 @@ export function RequestReplyModal({
                           id="attachment-upload"
                           type="file"
                           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                          multiple 
+                          multiple
                           className="hidden"
                           onChange={(event) => {
                             const files = event.target.files;

@@ -25,16 +25,30 @@ import { ExternalRequestDetailModal } from "./external-request-detail-modal";
 import { useQueryClient } from "@tanstack/react-query";
 import { MY_REQUESTS_EXTERNAL_QUERY_KEY } from "@/constants/queries";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MyRequestFilters {
   search: string;
   page: number;
   limit: number;
+  subject?: string;
+  radicado?: string;
+  status?: string;
 }
+
+const statusOptions = [
+  { label: "Pendiente", value: "PENDING" },
+  { label: "Completado", value: "COMPLETED" },
+];
 
 export function MyExternalRequestsContent() {
   const queryClient = useQueryClient();
-  const { status } = useRequestStatusStore();
 
   // Estado para el modal de completada de solicitud
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
@@ -49,6 +63,7 @@ export function MyExternalRequestsContent() {
 
   // Filtros para la tabla de solicitudes
   const [filters, setFilters] = useState<MyRequestFilters>({
+    status: "PENDING",
     search: "",
     page: 1,
     limit: 10,
@@ -64,15 +79,17 @@ export function MyExternalRequestsContent() {
 
   const { data: requestData, isLoading: isLoadingRequests } =
     useMyExternalRequests({
-      status: status || "PENDING",
+      status: filters.status || "PENDING",
       page: filters.page,
       limit: filters.limit,
+      subject: filters.subject,
+      radicado: filters.radicado,
     });
 
   const handleMarkAsCompleted = async (request: ExternalRequest) => {
     try {
       setIsLoadingCompleted(true);
-      await api.patch(`/request-external/${request.id}/status`);
+      await api.patch(`/request-external/${request.id}/complete`);
       queryClient.invalidateQueries({
         queryKey: [MY_REQUESTS_EXTERNAL_QUERY_KEY],
         exact: false,
@@ -127,15 +144,37 @@ export function MyExternalRequestsContent() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex-1 min-w-64">
-              <div className="relative max-w-xl">
+            <div className="flex-1 flex items-center gap-4 min-w-64">
+              <div className="relative flex items-center gap-4">
                 <SearchInput
-                  searchTerm={filters.search}
-                  placeholder="Buscar por nombre..."
-                  onSearch={(searchTerm) =>
-                    updateFilters({ search: searchTerm })
-                  }
+                  searchTerm={filters.subject || ""}
+                  placeholder="Buscar por asunto..."
+                  onSearch={(subject) => updateFilters({ subject })}
                 />
+
+                <SearchInput
+                  searchTerm={filters.radicado || ""}
+                  placeholder="Buscar por radicado..."
+                  onSearch={(radicado) => updateFilters({ radicado })}
+                />
+              </div>
+
+              <div className="min-w-48">
+                <Select
+                  value={filters.status}
+                  onValueChange={(value) => updateFilters({ status: value })}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filtrar por estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

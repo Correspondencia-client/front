@@ -29,8 +29,11 @@ import { CompleteRequestDialog } from "./completed-request-dialog";
 import api from "@/lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  KPI_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY,
   MY_ASSIGNED_REQUESTS_QUERY_KEY,
+  RECENT_ACTIVITY_QUERY_KEY,
+  STATUS_PIE_CHART_QUERY_KEY,
 } from "@/constants/queries";
 import { RequestAssignAreaModal } from "./request-assign-area-modal";
 
@@ -109,6 +112,13 @@ export function MyRequestsContent() {
         queryClient.invalidateQueries({
           queryKey: [MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY],
           exact: false,
+        });
+        queryClient.invalidateQueries({ queryKey: [KPI_QUERY_KEY] });
+        queryClient.invalidateQueries({
+          queryKey: [STATUS_PIE_CHART_QUERY_KEY],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [RECENT_ACTIVITY_QUERY_KEY],
         });
         toast.success("Solicitud marcada como completada");
         setSelectedRequest(null);

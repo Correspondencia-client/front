@@ -27,7 +27,11 @@ import {
 import { Area } from "@/types/area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AREAS_QUERY_KEY, ENTITIES_QUERY_KEY } from "@/constants/queries";
+import {
+  AREA_VOLUME_QUERY_KEY,
+  AREAS_QUERY_KEY,
+  ENTITIES_QUERY_KEY,
+} from "@/constants/queries";
 import { createArea, updateArea } from "@/utils/areas";
 import { areaFormSchema, AreaFormValues } from "@/schemas/area";
 import { useEntitySelection } from "@/stores/entity-selection";
@@ -81,9 +85,11 @@ export function AreaDialog({
       if (isEditMode) {
         await updateArea(areaToEdit!.id, data);
         toast.success("Area actualizada correctamente");
+        queryClient.invalidateQueries({ queryKey: [AREA_VOLUME_QUERY_KEY] });
       } else {
         await createArea(data, selectedEntity!.id);
         toast.success("Area creada correctamente");
+        queryClient.invalidateQueries({ queryKey: [AREA_VOLUME_QUERY_KEY] });
       }
 
       onOpenChange(false);

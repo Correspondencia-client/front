@@ -20,7 +20,7 @@ import { deleteUser } from "@/utils/users";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
+import { KPI_QUERY_KEY, USER_BY_ENTITY_QUERY_KEY } from "@/constants/queries";
 import { AlertDialogConfirm } from "@/components/common/alert-dialog-confirm";
 import { useAreasByEntity } from "@/hooks/use-areas";
 
@@ -97,6 +97,7 @@ export function UsersContent() {
       await deleteUser(userToDelete.id);
       toast.success("Usuario eliminado correctamente");
       queryClient.invalidateQueries({ queryKey: [USER_BY_ENTITY_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [KPI_QUERY_KEY] });
       setUserToDelete(null);
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;

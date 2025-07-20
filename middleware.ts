@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const publicRoutes = [
+  "/",
   "/iniciar-sesion",
   "/registrarse",
   "/verificacion-correo",
@@ -10,15 +11,17 @@ const publicRoutes = [
 ];
 
 const rolePermissions: Record<string, string[]> = {
-  CITIZEN: ["/panel", "/solicitudes/*"],
-  OFFICER: ["/panel", "/solicitudes/*"],
+  CITIZEN: ["/", "/panel", "/solicitudes/*"],
+  OFFICER: ["/", "/panel", "/solicitudes/*"],
   ADMIN: [
+    "/",
     "/panel",
     "/solicitudes/*",
     "/gestion-usuarios/admin",
     "/gestion-areas/admin",
   ],
   SUPER: [
+    "/",
     "/panel",
     "/gestion-usuarios/superadmin",
     "/gestion-entidades/superadmin",
@@ -159,7 +162,9 @@ export async function middleware(request: NextRequest) {
         response.headers.set("set-cookie", refreshResult.setCookieHeader);
         return response;
       } else {
-        const response = NextResponse.redirect(new URL("/iniciar-sesion", request.url));
+        const response = NextResponse.redirect(
+          new URL("/iniciar-sesion", request.url)
+        );
         response.cookies.delete("accessToken");
         response.cookies.delete("refreshToken");
         return response;

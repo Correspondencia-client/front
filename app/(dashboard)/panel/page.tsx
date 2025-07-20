@@ -12,8 +12,8 @@ export default function DashboardPage() {
     <div className="relative h-dvh overflow-y-hidden pt-12">
       <SiteHeader title="Panel" />
       <div className="flex h-full">
-        {user?.role === "CITIZEN" && <CitizenPanelContentWrapper />}
-        {user?.role !== "SUPER" && user?.role !== "CITIZEN" && <OfficerPanelContentWrapper />}
+        {user?.role === "CITIZEN" || user?.role === "OFFICER" && <CitizenPanelContentWrapper />}
+        {user?.role !== "SUPER" && user?.role !== "CITIZEN" && user?.role !== "OFFICER" && <OfficerPanelContentWrapper />}
       </div>
     </div>
   );
