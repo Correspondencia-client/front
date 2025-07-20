@@ -8,11 +8,13 @@ import { useAuthStore } from "@/stores/auth-store";
 export default function DashboardPage() {
   const { user } = useAuthStore()
 
+  console.log(user)
+
   return (
     <div className="relative h-dvh overflow-y-hidden pt-12">
       <SiteHeader title="Panel" />
       <div className="flex h-full">
-        {user?.role === "CITIZEN" || user?.role === "OFFICER" && <CitizenPanelContentWrapper />}
+        {(user?.role === "CITIZEN" || user?.role === "OFFICER") && <CitizenPanelContentWrapper />}
         {user?.role !== "SUPER" && user?.role !== "CITIZEN" && user?.role !== "OFFICER" && <OfficerPanelContentWrapper />}
       </div>
     </div>

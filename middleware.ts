@@ -239,8 +239,8 @@ const publicRoutes = [
 ];
 
 const rolePermissions: Record<string, string[]> = {
-  CITIZEN: ["/panel", "/solicitudes/ciudadano*"],
-  OFFICER: ["/panel", "/solicitudes/funcionario*"],
+  CITIZEN: ["/panel", "/solicitudes/ciudadano/*"],
+  OFFICER: ["/panel", "/solicitudes/funcionario/*"],
   ADMIN: [
     "/panel",
     "/solicitudes/funcionario/*",

@@ -90,9 +90,9 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         <QueryProvider>
-          <SocketProvider serverUrl="https://gestia.com.co">
+          {/* <SocketProvider serverUrl="https://gestia.com.co"> */}
             {children}
-          </SocketProvider>
+          {/* </SocketProvider> */}
           <Toaster richColors />
         </QueryProvider>
       </body>

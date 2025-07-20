@@ -19,10 +19,15 @@ import {
 export type RequestsCountByStatus = Partial<Record<RequestStatus, number>>;
 
 export async function getMyAssignedRequestsCountByStatus(): Promise<RequestsCountByStatus> {
-  const response = await api.get<RequestsCountByStatus>(
+  try {
+    const response = await api.get<RequestsCountByStatus>(
     "/requests/my-assigned/count-by-status"
   );
   return response.data;
+  } catch (error) {
+    console.log(error)
+    return { }
+  }
 }
 
 export async function getMyRequestsCount(): Promise<RequestsCountByStatus> {
