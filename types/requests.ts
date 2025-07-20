@@ -153,3 +153,11 @@ export type ApiExternalRequestsResponse = {
     totalPages: number;
   };
 };
+
+export interface GetExternalRequestsParams {
+  page: number;
+  limit: number;
+  status: string;
+  subject?: string;
+  radicado?: string;
+}

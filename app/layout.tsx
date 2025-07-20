@@ -75,7 +75,9 @@ export const metadata: Metadata = {
     images: ["/icons/og-image.png"],
   },
   icons: {
-    icon: "/icons/og-image.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
@@ -88,13 +90,9 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         <QueryProvider>
-          {/* <SocketProvider
-            serverUrl={
-              process.env.NEXT_PUBLIC_SOCKET_URL || "https://gestia.com.co"
-            }
-          > */}
-          {children}
-          {/* </SocketProvider> */}
+          <SocketProvider serverUrl="https://gestia.com.co">
+            {children}
+          </SocketProvider>
           <Toaster richColors />
         </QueryProvider>
       </body>

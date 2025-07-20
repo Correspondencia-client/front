@@ -11,6 +11,7 @@ import {
   AssignedRequestParams,
   AssignedRequestsResponse,
   ExternalRequestsResponse,
+  GetExternalRequestsParams,
   RequestHistoryItem,
   RequestStatus,
 } from "@/types/requests";
@@ -144,99 +145,113 @@ export const createCitizenRequest = async (data: CitizenRequestFormValues) => {
   return response.data;
 };
 
-// export const createExternalRequest = async (
-//   values: AdminRequestFormValues,
-//   entityId: string
-// ) => {
-//   const formData = new FormData();
-
-//   // Añadir campos de texto al FormData
-//   formData.append("subject", values.title);
-//   formData.append("content", JSON.stringify({ texto: values.description }));
-//   formData.append("recipient", values.recipientName);
-//   formData.append("mailrecipient", values.recipientEmail);
-//   formData.append("typeRequest", values.requestType);
-//   formData.append("maxResponseDays", String(Number(values.maxResponseDays)));
-//   formData.append("entityId", entityId);
-
-//   // Añadir archivos adjuntos si existen
-//   if (values.attachment && values.attachment.length > 0) {
-//     for (let i = 0; i < values.attachment.length; i++) {
-//       formData.append("attachments", values.attachment[i]);
-//     }
-//   }
-
-//   const { data } = await api.post("/request-external", formData, {
-//     headers: {
-//       "Content-Type": "multipart/form-data",
-//     },
-//   });
-
-//   return data;
-// };
-
-// NOTA: Esta función ha sido actualizada para enviar un payload JSON
-// en lugar de FormData, según la nueva estructura de la API.
-// La subida de archivos adjuntos ya no se maneja aquí.
-// Si necesitas subir archivos, considera un endpoint separado
-// o ajustar la API para que acepte 'multipart/form-data' junto con un campo JSON.
 export const createExternalRequest = async (
   values: AdminRequestFormValues,
   entityId: string
 ) => {
-  const payload = {
-    typeRequest: values.requestType,
-    recipient: values.recipientName,
-    mailrecipient: values.recipientEmail,
-    maxResponseDays: Number(values.maxResponseDays),
-    subject: values.title,
-    content: {
-      texto: values.description,
-    },
-    entityId: entityId,
-  };
+  const formData = new FormData();
 
-  // Los archivos adjuntos no están en el nuevo payload.
-  // Si 'values.attachment' contiene archivos, no se enviarán con esta petición.
+  // Añadir campos de texto al FormData
+  formData.append("subject", values.title);
+  formData.append("content", JSON.stringify({ texto: values.description }));
+  formData.append("recipient", values.recipientName);
+  formData.append("mailrecipient", values.recipientEmail);
+  formData.append("typeRequest", values.requestType);
+  formData.append("maxResponseDays", values.maxResponseDays);
+  formData.append("entityId", entityId);
 
-  const { data } = await api.post("/request-external", payload, {
+  // Añadir archivos adjuntos si existen
+  if (values.attachment && values.attachment.length > 0) {
+    for (let i = 0; i < values.attachment.length; i++) {
+      formData.append("attachments", values.attachment[i]);
+    }
+  }
+
+  const { data } = await api.post("/request-external", formData, {
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "multipart/form-data",
     },
   });
 
   return data;
 };
 
-export const getExternalRequests =
-  async (): Promise<ExternalRequestsResponse> => {
-    try {
-      const response = await api.get<ApiExternalRequestsResponse>(
-        "/request-external"
-      );
+// export const getExternalRequests =
+//   async (): Promise<ExternalRequestsResponse> => {
+//     try {
+//       const response = await api.get<ApiExternalRequestsResponse>(
+//         "/request-external"
+//       );
 
-      const {
-        data,
-        meta: { totalItems, page, limit, totalPages },
-      } = response.data;
+//       const {
+//         data,
+//         meta: { totalItems, page, limit, totalPages },
+//       } = response.data;
 
-      return {
-        requests: data ?? [],
-        total: totalItems,
-        page,
-        limit,
-        totalPages,
-      };
-    } catch (error) {
-      return {
-        requests: [],
-        total: 0,
-        page: 1,
-        limit: 10,
-        totalPages: 1,
-      };
-    }
-  };
+//       return {
+//         requests: data ?? [],
+//         total: totalItems,
+//         page,
+//         limit,
+//         totalPages,
+//       };
+//     } catch (error) {
+//       return {
+//         requests: [],
+//         total: 0,
+//         page: 1,
+//         limit: 10,
+//         totalPages: 1,
+//       };
+//     }
+//   };
+
+export const getExternalRequests = async ({
+  page,
+  limit,
+  status,
+  subject = "",
+  radicado = "",
+}: GetExternalRequestsParams): Promise<ExternalRequestsResponse> => {
+  try {
+    const response = await api.get<ApiExternalRequestsResponse>(
+      "/request-external",
+      {
+        params: {
+          page,
+          limit,
+          status,
+          subject,
+          radicado,
+        },
+      }
+    );
+
+    console.log(response.data)
+
+    const {
+      data,
+      meta: { totalItems, page: currentPage, limit: currentLimit, totalPages },
+    } = response.data;
+
+    return {
+      requests: data ?? [],
+      total: totalItems,
+      page: currentPage,
+      limit: currentLimit,
+      totalPages,
+    };
+  } catch (error) {
+    console.log(error)
+    return {
+      requests: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    };
+  }
+};
 
 export const getRequestHistory = async (
   requestId: string

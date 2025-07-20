@@ -12,7 +12,7 @@ import { useEntitySelection } from "@/stores/entity-selection";
 import { DataTable } from "@/components/ui/data-table";
 import { Paginator } from "@/components/common/paginator";
 import { useQueryClient } from "@tanstack/react-query";
-import { AREAS_QUERY_KEY, ENTITIES_QUERY_KEY } from "@/constants/queries";
+import { AREA_VOLUME_QUERY_KEY, AREAS_QUERY_KEY, ENTITIES_QUERY_KEY } from "@/constants/queries";
 import { AlertDialogConfirm } from "@/components/common/alert-dialog-confirm";
 import { AreaDialog } from "@/components/areas/content/area-dialog";
 import { useAreasByEntity } from "@/hooks/use-areas";
@@ -80,6 +80,8 @@ export function AreasContent() {
         queryKey: [ENTITIES_QUERY_KEY],
         exact: false,
       });
+      queryClient.invalidateQueries({ queryKey: [AREA_VOLUME_QUERY_KEY] });
+
       setAreaToDelete(null);
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;

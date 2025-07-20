@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -16,69 +17,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { subDays } from "date-fns";
+import { useRecentActivity } from "@/hooks/use-analytics";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { ListOrdered } from "lucide-react";
-import React, { useMemo, useState } from "react";
-import { DateRange } from "react-day-picker";
-
-const recentActivityData = [
-  {
-    id: "SOL-001",
-    asunto: "Solicitud de Información Pública",
-    area: "Secretaría de Gobierno",
-    estado: "Nuevo",
-    fecha: "2024-07-17",
-  },
-  {
-    id: "SOL-002",
-    asunto: "Petición de Documentos",
-    area: "Planeación",
-    estado: "En Proceso",
-    fecha: "2024-07-16",
-  },
-  {
-    id: "SOL-003",
-    asunto: "Queja por Servicio",
-    area: "Obras Públicas",
-    estado: "Resuelto",
-    fecha: "2024-07-15",
-  },
-  {
-    id: "SOL-004",
-    asunto: "Solicitud de Reunión",
-    area: "Hacienda",
-    estado: "Rechazado",
-    fecha: "2024-07-14",
-  },
-  {
-    id: "SOL-005",
-    asunto: "Consulta de Normativa",
-    area: "Educación",
-    estado: "En Proceso",
-    fecha: "2024-07-13",
-  },
-];
 
 const getEstadoBadge = (estado: string) => {
   switch (estado) {
-    case "Nuevo":
-      return <Badge variant="secondary">Nuevo</Badge>;
-    case "En Proceso":
+    case "PENDING":
       return (
-        <Badge variant="default" className="bg-blue-100 text-blue-800">
-          En Proceso
+        <Badge variant="secondary" className="bg-gray-200 text-gray-800">
+          Pendiente
         </Badge>
       );
-    case "Resuelto":
+    case "IN_REVIEW":
+      return (
+        <Badge variant="default" className="bg-yellow-100 text-yellow-800">
+          En Revisión
+        </Badge>
+      );
+    case "COMPLETED":
       return (
         <Badge variant="default" className="bg-green-100 text-green-800">
-          Resuelto
+          Completada
         </Badge>
       );
-    case "Rechazado":
+    case "OVERDUE":
       return (
         <Badge variant="default" className="bg-red-100 text-red-800">
-          Rechazado
+          Vencida
         </Badge>
       );
     default:
@@ -86,16 +53,18 @@ const getEstadoBadge = (estado: string) => {
   }
 };
 
-export function RecentActivityTable() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date(),
-  });
+// Formato para "Vence el"
+const formatVenceEl = (dateStr: string) =>
+  format(new Date(dateStr), "MMMM dd, yyyy", { locale: es });
 
-  const filteredRecentActivityData = useMemo(
-    () => recentActivityData,
-    [dateRange]
-  );
+// Formato para "Fecha de creación" (con hora 12h)
+const formatCreado = (dateStr: string) =>
+  format(new Date(dateStr), "MMMM dd, yyyy - hh:mm a", { locale: es })
+    .replace("AM", "a. m.")
+    .replace("PM", "p. m.");
+
+export function RecentActivityTable() {
+  const { data, isLoading, isError } = useRecentActivity();
 
   return (
     <Card>
@@ -113,35 +82,45 @@ export function RecentActivityTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID Solicitud</TableHead>
+                <TableHead>Radicado</TableHead>
                 <TableHead>Asunto</TableHead>
-                <TableHead>Área Asignada</TableHead>
+                <TableHead>Vence el</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Fecha de Creación</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRecentActivityData.length > 0 ? (
-                filteredRecentActivityData.map((solicitud) => (
-                  <TableRow key={solicitud.id}>
-                    <TableCell className="font-medium">
-                      {solicitud.id}
-                    </TableCell>
-                    <TableCell>{solicitud.asunto}</TableCell>
-                    <TableCell>{solicitud.area}</TableCell>
-                    <TableCell>{getEstadoBadge(solicitud.estado)}</TableCell>
-                    <TableCell>{solicitud.fecha}</TableCell>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <TableCell key={j}>
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))
-              ) : (
+              ) : !data || data.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    No hay actividad reciente.
+                    No hay solicitudes recientes registradas.
                   </TableCell>
                 </TableRow>
+              ) : (
+                data.map((solicitud) => (
+                  <TableRow key={solicitud.id}>
+                    <TableCell className="font-medium">
+                      {solicitud.radicado}
+                    </TableCell>
+                    <TableCell>{solicitud.subject}</TableCell>
+                    <TableCell>{formatVenceEl(solicitud.deadline)}</TableCell>
+                    <TableCell>{getEstadoBadge(solicitud.status)}</TableCell>
+                    <TableCell>{formatCreado(solicitud.createdAt)}</TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

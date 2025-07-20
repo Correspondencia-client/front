@@ -10,3 +10,8 @@ export const MY_REQUESTS_EXTERNAL_QUERY_KEY = "my-external-requests";
 export const MY_ASSIGNED_REQUESTS_COUNT_BY_STATUS_QUERY_KEY =
   "my-assigned-requests-count-by-status";
 export const MY_REQUESTS_COUNT_QUERY_KEY = "my-requests-status";
+export const KPI_QUERY_KEY = "kpi-data";
+export const AREA_VOLUME_QUERY_KEY = "area-volume-data";
+export const STATUS_PIE_CHART_QUERY_KEY = "status-pie-chart-data";
+export const REQUESTS_TREND_QUERY_KEY = "requests-trend";
+export const RECENT_ACTIVITY_QUERY_KEY = "recent-activity";

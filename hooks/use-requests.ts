@@ -16,7 +16,7 @@ import {
   getRequestHistory,
   RequestsCountByStatus,
 } from "@/utils/requests";
-import { AssignedRequestParams, RequestHistoryItem } from "@/types/requests";
+import { AssignedRequestParams, GetExternalRequestsParams, RequestHistoryItem } from "@/types/requests";
 
 export function useMyAssignedRequests({
   status,
@@ -42,15 +42,22 @@ export function useMyRequests({
   });
 }
 
-export function useMyExternalRequests({
-  status,
-  page = 1,
-  limit = 10,
-}: AssignedRequestParams) {
+// export function useMyExternalRequests({
+//   status,
+//   page = 1,
+//   limit = 10,
+// }: AssignedRequestParams) {
+//   return useQuery({
+//     queryKey: [MY_REQUESTS_EXTERNAL_QUERY_KEY, status, page, limit],
+//     queryFn: () => getExternalRequests(),
+//     enabled: !!status,
+//   });
+// }
+export function useMyExternalRequests(params: GetExternalRequestsParams) {
   return useQuery({
-    queryKey: [MY_REQUESTS_EXTERNAL_QUERY_KEY, status, page, limit],
-    queryFn: () => getExternalRequests(),
-    enabled: !!status,
+    queryKey: [MY_REQUESTS_EXTERNAL_QUERY_KEY, params],
+    queryFn: () => getExternalRequests(params),
+    enabled: !!params.status,
   });
 }
 
