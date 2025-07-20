@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     siteName: "Gestia",
     images: [
       {
-        url: "/icons/logo.svg",
+        url: "/icons/og-image.png",
         alt: "Plataforma Gestia para la gestión de trámites",
       },
     ],
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     title: "Gestia - Gestión Inteligente de Trámites y Solicitudes",
     description:
       "Modernizando la gestión de trámites entre entidades y ciudadanos.",
-    images: ["/icons/logo.svg"],
+    images: ["/icons/og-image.png"],
   },
   icons: {
     icon: "/favicon.ico",
