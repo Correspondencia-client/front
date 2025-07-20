@@ -35,21 +35,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const requestsByEntity = [
-  { entityName: "Alcaldía Municipal", count: 20, fill: "var(--chart-1)" },
-  { entityName: "Gobernación", count: 32, fill: "var(--chart-2)" },
-  { entityName: "Secretaría de Salud", count: 28, fill: "var(--chart-3)" },
-  // ... más entidades
-];
-
 export function CitizenPanelContent() {
   const { user } = useAuthStore();
 
+  // Hook condicional para CITIZEN - solo se ejecuta si el usuario es CITIZEN
   const { data: countsByStatus, isLoading: isLoadingCounts } =
-    useMyRequestsCount();
+    useMyRequestsCount({
+      enabled: user?.role === "CITIZEN",
+    });
 
+  // Hook condicional para OFFICER - solo se ejecuta si el usuario es OFFICER
   const { data: officerCountsByStatus, isLoading: isLoadingOfficerCounts } =
-    useMyAssignedRequestsCountByStatus();
+    useMyAssignedRequestsCountByStatus({
+      enabled: user?.role === "OFFICER",
+    });
 
   const { data: requestData, isLoading: isLoadingRequests } = useMyRequests({
     status: "PENDING",

@@ -12,8 +12,10 @@ import {
   AssignedRequestsResponse,
   ExternalRequestsResponse,
   GetExternalRequestsParams,
+  GetUnifiedReportsParams,
   RequestHistoryItem,
   RequestStatus,
+  UnifiedReportsResponse,
 } from "@/types/requests";
 
 export type RequestsCountByStatus = Partial<Record<RequestStatus, number>>;
@@ -21,12 +23,12 @@ export type RequestsCountByStatus = Partial<Record<RequestStatus, number>>;
 export async function getMyAssignedRequestsCountByStatus(): Promise<RequestsCountByStatus> {
   try {
     const response = await api.get<RequestsCountByStatus>(
-    "/requests/my-assigned/count-by-status"
-  );
-  return response.data;
+      "/requests/my-assigned/count-by-status"
+    );
+    return response.data;
   } catch (error) {
-    console.log(error)
-    return { }
+    console.log(error);
+    return {};
   }
 }
 
@@ -181,36 +183,6 @@ export const createExternalRequest = async (
   return data;
 };
 
-// export const getExternalRequests =
-//   async (): Promise<ExternalRequestsResponse> => {
-//     try {
-//       const response = await api.get<ApiExternalRequestsResponse>(
-//         "/request-external"
-//       );
-
-//       const {
-//         data,
-//         meta: { totalItems, page, limit, totalPages },
-//       } = response.data;
-
-//       return {
-//         requests: data ?? [],
-//         total: totalItems,
-//         page,
-//         limit,
-//         totalPages,
-//       };
-//     } catch (error) {
-//       return {
-//         requests: [],
-//         total: 0,
-//         page: 1,
-//         limit: 10,
-//         totalPages: 1,
-//       };
-//     }
-//   };
-
 export const getExternalRequests = async ({
   page,
   limit,
@@ -232,7 +204,7 @@ export const getExternalRequests = async ({
       }
     );
 
-    console.log(response.data)
+    console.log(response.data);
 
     const {
       data,
@@ -247,7 +219,6 @@ export const getExternalRequests = async ({
       totalPages,
     };
   } catch (error) {
-    console.log(error)
     return {
       requests: [],
       total: 0,
@@ -274,4 +245,35 @@ export async function assignRequestToArea(
     payload
   );
   return response.data;
+}
+
+export async function getUnifiedReports(
+  params: GetUnifiedReportsParams
+): Promise<UnifiedReportsResponse> {
+  try {
+    const response = await api.get("/requests/reportes", { params });
+
+    const {
+      data,
+      meta: { totalItems, page: currentPage, limit: currentLimit, totalPages },
+    } = response.data;
+
+    console.log("RESPONSE: ", response)
+
+    return {
+      requests: data ?? [],
+      total: totalItems,
+      page: currentPage,
+      limit: currentLimit,
+      totalPages,
+    };
+  } catch (error) {
+    return {
+      requests: [],
+      total: 0,
+      page: params.page || 1,
+      limit: params.limit || 10,
+      totalPages: 1,
+    };
+  }
 }

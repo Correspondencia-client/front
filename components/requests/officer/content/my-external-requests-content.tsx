@@ -144,8 +144,8 @@ export function MyExternalRequestsContent() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex-1 flex items-center gap-4 min-w-64">
-              <div className="relative flex items-center gap-4">
+            <div className="flex-1 flex flex-col md:flex-row md:items-center gap-4 min-w-64">
+              <div className="relative flex flex-col md:flex-row md:items-center gap-4">
                 <SearchInput
                   searchTerm={filters.subject || ""}
                   placeholder="Buscar por asunto..."

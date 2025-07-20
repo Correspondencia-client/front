@@ -76,6 +76,11 @@ export const routes = {
       url: "/gestion-areas/admin",
       icon: Building,
     },
+    {
+      name: "Reportes",
+      url: "/reportes",
+      icon: FileText,
+    },
   ],
   administrationSuperAdmin: [
     {

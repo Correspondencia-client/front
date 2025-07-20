@@ -161,3 +161,20 @@ export interface GetExternalRequestsParams {
   subject?: string;
   radicado?: string;
 }
+
+export interface GetUnifiedReportsParams {
+  page?: number;
+  limit?: number;
+  radicado?: string;
+  subject?: string;
+  status?: "PENDING" | "IN_REVIEW" | "COMPLETED" | "OVERDUE";
+  type?: "internal" | "external";
+}
+
+export interface UnifiedReportsResponse {
+  requests: any[]; // Reemplázalo con tu tipo correcto si lo tienes
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

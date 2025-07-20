@@ -15,3 +15,5 @@ export const AREA_VOLUME_QUERY_KEY = "area-volume-data";
 export const STATUS_PIE_CHART_QUERY_KEY = "status-pie-chart-data";
 export const REQUESTS_TREND_QUERY_KEY = "requests-trend";
 export const RECENT_ACTIVITY_QUERY_KEY = "recent-activity";
+export const UNIFIED_REQUESTS_QUERY_KEY = "unified-requests";
+
